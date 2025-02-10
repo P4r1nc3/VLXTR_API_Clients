@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build:
@@ -32,7 +33,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Packages
     needs: build
-    if: github.event_name == 'push'
+#    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
@@ -58,6 +59,20 @@ jobs:
           java-version: '17'
           server-id: github
           settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        if: env.changes_detected == 'true'
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.TOKEN_GITHUB }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
 
       - name: Increment version
         if: env.changes_detected == 'true'
