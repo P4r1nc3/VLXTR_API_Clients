@@ -1,21 +1,13 @@
 name: Deploy Allegro API
 
 on:
-  pull_request:
+  push:
     branches:
       - master
   workflow_run:
     workflows: [ "Build Check" ]
     types:
       - completed
-#on:
-#  push:
-#    branches:
-#      - master
-#  workflow_run:
-#    workflows: [ "Build Check" ]
-#    types:
-#      - completed
 
 jobs:
   check-changes:
