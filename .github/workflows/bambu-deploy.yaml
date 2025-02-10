@@ -1,9 +1,13 @@
 name: Deploy Bambu API
 
 on:
-  push:
+  pull_request:
     branches:
       - master
+#on:
+#  push:
+#    branches:
+#      - master
 
 jobs:
   check-changes:
