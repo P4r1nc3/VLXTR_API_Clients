@@ -33,7 +33,7 @@ jobs:
   deploy:
     name: Deploy to GitHub Packages
     needs: build
-#    if: github.event_name == 'push'
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
 
     steps:
