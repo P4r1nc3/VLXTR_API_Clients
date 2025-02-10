@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Bambu Lab Printers Management API
-  description: API for managing printers using PyMongo
+  description: API for managing printers using PyMongo.
   version: 1.0.0
 servers:
   - url: http://localhost:8000
