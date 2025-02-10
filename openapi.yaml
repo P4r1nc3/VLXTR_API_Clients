@@ -10,19 +10,19 @@ servers:
 paths:
   /offers:
     get:
-      summary: Retrieve a list of offers from Allegro.
+      summary: Retrieve a list of offers from Allegro
       description: Fetches offers available in Allegro based on the provided authorization token.
       operationId: getOffers
       parameters:
         - name: Authorization
           in: header
           required: true
-          description: Bearer token for authentication.
+          description: Bearer token for authentication
           schema:
             type: string
       responses:
         '200':
-          description: Successfully retrieved offers.
+          description: Successfully retrieved offers
           content:
             application/json:
               schema:
