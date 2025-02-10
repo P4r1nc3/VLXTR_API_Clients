@@ -8,6 +8,9 @@ on:
     branches:
       - master
 
+permissions:
+  contents: write
+
 jobs:
   build:
     name: Build Check
@@ -63,15 +66,16 @@ jobs:
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
           NEW_VERSION="$major.$((minor + 1)).0"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
-          echo "New version: $NEW_VERSION"
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Commit updated version
         if: env.changes_detected == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git commit -am "chore: Bump version to $NEW_VERSION [skip ci]"
-          git push
+          git add pom.xml
+          git commit -m "chore: Bump version to $NEW_VERSION [skip ci]"
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
 
       - name: Deploy to GitHub Packages
         if: env.changes_detected == 'true'
