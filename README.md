@@ -1,6 +1,8 @@
-# Publishing and Using VLXTR OpenAPI on GitHub Packages
+# VLXTR OpenAPI Clients
 
-## 📌 Prerequisites
+### **Publishing and Using VLXTR OpenAPI on GitHub Packages**
+
+## **Prerequisites**
 Before publishing or using the package, ensure you have:
 - **Maven installed** (`mvn -version` to check)
 - **GitHub Personal Access Token (PAT)** with `read:packages`, `write:packages`, and `delete:packages` permissions. [Create a token here](https://github.com/settings/tokens)
@@ -8,11 +10,11 @@ Before publishing or using the package, ensure you have:
 
 ---
 
-## 🚀 Publishing a New Version
-After making changes to the project, follow these steps to publish the updated package:
+## **Publishing a New Version**
+After making changes to the project, follow these steps to publish the updated package.
 
-### 1️⃣ Update `pom.xml`
-Ensure the `pom.xml` file includes the correct repository configuration:
+### **1. Update `pom.xml`**
+Ensure the `pom.xml` file in the **parent project** includes the correct repository configuration:
 
 ```xml
 <distributionManagement>
@@ -23,8 +25,12 @@ Ensure the `pom.xml` file includes the correct repository configuration:
 </distributionManagement>
 ```
 
-### 2️⃣ Configure Authentication
-Add your GitHub credentials to `settings.xml` located at `~/.m2/settings.xml` (Linux/Mac) or `C:\Users\your-user\.m2\settings.xml` (Windows):
+Each module (`vlxtr-allegro-api` and `vlxtr-bambu-api`) **inherits this configuration**.
+
+### **2. Configure Authentication**
+Add GitHub credentials to `settings.xml` located at:
+- **Linux/Mac**: `~/.m2/settings.xml`
+- **Windows**: `C:\Users\your-user\.m2\settings.xml`
 
 ```xml
 <servers>
@@ -36,21 +42,27 @@ Add your GitHub credentials to `settings.xml` located at `~/.m2/settings.xml` (L
 </servers>
 ```
 
-### 3️⃣ Deploy the Package
-Run the following command to publish the package to GitHub Packages:
+### **3. Deploy Each Module Separately**
+Since this project has **two separate clients**, deploy them individually.
 
+#### **Deploy VLXTR Allegro API**
 ```sh
-mvn clean deploy
+mvn clean deploy -pl vlxtr-allegro-api
 ```
 
-Once completed, the package will be available in GitHub Packages.
+#### **Deploy VLXTR Bambu API**
+```sh
+mvn clean deploy -pl vlxtr-bambu-api
+```
+
+Once completed, both packages will be available in GitHub Packages.
 
 ---
 
-## 📦 Using VLXTR OpenAPI in Other Projects
-To use this package in another project, add the following configurations.
+## **Using VLXTR OpenAPI in Other Projects**
+To use these packages in another project, add the following configurations.
 
-### 1️⃣ Add GitHub Repository in `pom.xml`
+### **1. Add GitHub Repository in `pom.xml`**
 ```xml
 <repositories>
     <repository>
@@ -60,16 +72,27 @@ To use this package in another project, add the following configurations.
 </repositories>
 ```
 
-### 2️⃣ Add the Dependency
+### **2. Add Dependencies for Each API**
+
+#### **Using VLXTR Allegro API**
 ```xml
 <dependency>
     <groupId>com.p4r1nc3.vlxtr</groupId>
-    <artifactId>vlxtr-openapi</artifactId>
+    <artifactId>vlxtr-allegro-api</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
 
-### 3️⃣ Ensure Authentication
+#### **Using VLXTR Bambu API**
+```xml
+<dependency>
+    <groupId>com.p4r1nc3.vlxtr</groupId>
+    <artifactId>vlxtr-bambu-api</artifactId>
+    <version>1.0-SNAPSHOT</version>
+</dependency>
+```
+
+### **3. Ensure Authentication**
 Users must also add their credentials in `~/.m2/settings.xml` to authenticate when pulling the package:
 
 ```xml
@@ -84,13 +107,12 @@ Users must also add their credentials in `~/.m2/settings.xml` to authenticate wh
 
 ---
 
-## 📍 Where to Find the Package?
-The package will be available at:
-👉 **[GitHub Packages - VLXTR OpenAPI](https://github.com/P4r1nc3/VLXTR_OpenAPI/packages)**
+## **Where to Find the Packages?**
+The packages will be available at:
+- **[GitHub Packages - VLXTR OpenAPI](https://github.com/P4r1nc3/VLXTR_OpenAPI/packages)**
 
-This package can now be used across projects while ensuring proper authentication.
+Each module is published separately and can be used independently in projects.
 
 ---
 
-✅ **That's it!** Your package is now published and ready for use! 🎉
-
+This setup ensures that **each API is built and deployed separately while maintaining proper authentication** for usage.
