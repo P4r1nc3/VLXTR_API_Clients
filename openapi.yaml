@@ -1,0 +1,216 @@
+openapi: 3.0.3
+info:
+  title: Allegro API
+  description: This API allows users to fetch offers from Allegro using an Authorization Bearer token.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8080/allegro
+    description: Local development server
+
+paths:
+  /offers:
+    get:
+      summary: Retrieve a list of offers from Allegro
+      description: Fetches offers available in Allegro based on the provided authorization token.
+      operationId: getOffers
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token for authentication
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successfully retrieved offers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OffersResponse'
+        '401':
+          description: Unauthorized - Invalid or missing token
+        '500':
+          description: Internal server error
+
+components:
+  schemas:
+    OffersResponse:
+      type: object
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: '#/components/schemas/Offer'
+        count:
+          type: integer
+          description: Number of offers returned in this response
+        totalCount:
+          type: integer
+          description: Total number of available offers
+
+    Offer:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          $ref: '#/components/schemas/Category'
+        primaryImage:
+          $ref: '#/components/schemas/Image'
+        sellingMode:
+          $ref: '#/components/schemas/SellingMode'
+        saleInfo:
+          $ref: '#/components/schemas/SaleInfo'
+        stats:
+          $ref: '#/components/schemas/Stats'
+        stock:
+          $ref: '#/components/schemas/Stock'
+        publication:
+          $ref: '#/components/schemas/Publication'
+        afterSalesServices:
+          $ref: '#/components/schemas/AfterSalesServices'
+        delivery:
+          $ref: '#/components/schemas/Delivery'
+        b2b:
+          $ref: '#/components/schemas/B2B'
+        additionalMarketplaces:
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/AdditionalMarketplace'
+
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+
+    Image:
+      type: object
+      properties:
+        url:
+          type: string
+
+    SellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+        price:
+          $ref: '#/components/schemas/Price'
+        minimalPrice:
+          $ref: '#/components/schemas/Price'
+        startingPrice:
+          $ref: '#/components/schemas/Price'
+        priceAutomation:
+          type: object
+          description: Placeholder for future price automation properties
+
+    Price:
+      type: object
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+
+    SaleInfo:
+      type: object
+      properties:
+        currentPrice:
+          $ref: '#/components/schemas/Price'
+        biddersCount:
+          type: integer
+
+    Stats:
+      type: object
+      properties:
+        watchersCount:
+          type: integer
+        visitsCount:
+          type: integer
+
+    Stock:
+      type: object
+      properties:
+        available:
+          type: integer
+        sold:
+          type: integer
+
+    Publication:
+      type: object
+      properties:
+        status:
+          type: string
+        startingAt:
+          type: string
+          format: date-time
+        startedAt:
+          type: string
+          format: date-time
+        endingAt:
+          type: string
+          format: date-time
+        endedAt:
+          type: string
+          format: date-time
+        marketplaces:
+          $ref: '#/components/schemas/Marketplaces'
+
+    Marketplaces:
+      type: object
+      properties:
+        base:
+          $ref: '#/components/schemas/BaseMarketplace'
+        additional:
+          type: array
+          items:
+            $ref: '#/components/schemas/AdditionalMarketplace'
+
+    BaseMarketplace:
+      type: object
+      properties:
+        id:
+          type: string
+
+    AfterSalesServices:
+      type: object
+      properties:
+        warranty:
+          type: object
+        returnPolicy:
+          type: object
+        impliedWarranty:
+          type: object
+
+    Delivery:
+      type: object
+      properties:
+        shippingRates:
+          $ref: '#/components/schemas/ShippingRates'
+
+    ShippingRates:
+      type: object
+      properties:
+        id:
+          type: string
+
+    B2B:
+      type: object
+      properties:
+        buyableOnlyByBusiness:
+          type: boolean
+
+    AdditionalMarketplace:
+      type: object
+      properties:
+        publication:
+          $ref: '#/components/schemas/PublicationState'
+
+    PublicationState:
+      type: object
+      properties:
+        state:
+          type: string
