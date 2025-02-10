@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Allegro API
+  title: VLXTR Allegro API
   description: This API allows users to interact with their Allegro account.
   version: 1.0.0
 servers:
