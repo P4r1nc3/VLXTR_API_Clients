@@ -1,0 +1,137 @@
+openapi: 3.0.3
+info:
+  title: Bambu Lab Printers Management API
+  description: API for managing printers using PyMongo.
+  version: 1.0.0
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+paths:
+  /printers/:
+    get:
+      tags:
+        - Printers
+      summary: Get All Printers
+      operationId: get_all_printers_printers__get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Printer'
+                type: array
+    post:
+      tags:
+        - Printers
+      summary: Add Printer
+      operationId: add_printer_printers__post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrinterCreate'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Printer'
+  '/printers/{serial}':
+    get:
+      tags:
+        - Printers
+      summary: Get Printer
+      operationId: get_printer_printers__serial__get
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Printer'
+    put:
+      tags:
+        - Printers
+      summary: Update Printer
+      operationId: update_printer_printers__serial__put
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PrinterUpdate'
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Printer'
+    delete:
+      tags:
+        - Printers
+      summary: Delete Printer
+      operationId: delete_printer_printers__serial__delete
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Successful Response
+components:
+  schemas:
+    Printer:
+      properties:
+        ip:
+          type: string
+        serial:
+          type: string
+        access_code:
+          type: string
+      type: object
+      required:
+        - ip
+        - serial
+        - access_code
+    PrinterCreate:
+      properties:
+        ip:
+          type: string
+        serial:
+          type: string
+        access_code:
+          type: string
+      type: object
+      required:
+        - ip
+        - serial
+        - access_code
+    PrinterUpdate:
+      properties:
+        ip:
+          type: string
+        serial:
+          type: string
+        access_code:
+          type: string
+      type: object

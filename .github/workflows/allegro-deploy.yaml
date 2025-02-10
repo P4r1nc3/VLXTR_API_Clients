@@ -1,0 +1,86 @@
+name: Deploy Allegro API
+
+on:
+  pull_request:
+    branches:
+      - master
+#on:
+#  push:
+#    branches:
+#      - master
+
+jobs:
+  check-changes:
+    name: Check Allegro API Changes
+    runs-on: ubuntu-latest
+    outputs:
+      changed: ${{ steps.detect_changes.outputs.allegro_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in Allegro API
+        id: detect_changes
+        run: |
+          allegro_changed="false"
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-allegro-api.yaml'; then
+            allegro_changed="true"
+          fi
+          echo "allegro_changed=$allegro_changed" >> $GITHUB_ENV
+          echo "::set-output name=allegro_changed::$allegro_changed"
+
+  deploy-allegro:
+    name: Deploy Allegro API
+    needs: check-changes
+    if: needs.check-changes.outputs.changed == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.TOKEN_GITHUB }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Increment version for Allegro API
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          NEW_VERSION="$major.$((minor + 1)).0"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add vlxtr-allegro-api/pom.xml
+          git commit -m "chore: Bump Allegro API version to $NEW_VERSION [skip ci]"
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
+
+      - name: Deploy Allegro API
+        run: mvn clean deploy -pl vlxtr-allegro-api
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
