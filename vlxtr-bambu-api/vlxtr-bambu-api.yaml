@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: Bambu Lab Printers Management API
+  title: VLXTR Bambu API
   description: API for managing printers using PyMongo.
   version: 1.0.0
 servers:
