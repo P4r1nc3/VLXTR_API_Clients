@@ -4,10 +4,18 @@ on:
   pull_request:
     branches:
       - master
+  workflow_run:
+    workflows: [ "Build Check" ]
+    types:
+      - completed
 #on:
 #  push:
 #    branches:
 #      - master
+#  workflow_run:
+#    workflows: [ "Build Check" ]
+#    types:
+#      - completed
 
 jobs:
   check-changes:
@@ -76,6 +84,7 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
+          git pull --rebase https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git master
           git add vlxtr-allegro-api/pom.xml
           git commit -m "chore: Bump Allegro API version to $NEW_VERSION [skip ci]"
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
