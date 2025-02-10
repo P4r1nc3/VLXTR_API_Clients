@@ -1,0 +1,80 @@
+name: Build and Deploy
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    name: Build Check
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+
+      - name: Build and Verify
+        run: mvn clean verify
+
+  deploy:
+    name: Deploy to GitHub Packages
+    needs: build
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check for changes in openapi.yaml
+        id: check_changes
+        run: |
+          if git diff --name-only HEAD^ HEAD | grep -q 'openapi.yaml'; then
+            echo "changes_detected=true" >> $GITHUB_ENV
+          else
+            echo "changes_detected=false" >> $GITHUB_ENV
+          fi
+
+      - name: Set up Java and Maven
+        if: env.changes_detected == 'true'
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Increment version
+        if: env.changes_detected == 'true'
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          NEW_VERSION="$major.$((minor + 1)).0"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+          echo "New version: $NEW_VERSION"
+
+      - name: Commit updated version
+        if: env.changes_detected == 'true'
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git commit -am "chore: Bump version to $NEW_VERSION [skip ci]"
+          git push
+
+      - name: Deploy to GitHub Packages
+        if: env.changes_detected == 'true'
+        run: mvn clean deploy
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}

@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   title: Allegro API
-  description: This API allows users to fetch offers from Allegro using an Authorization Bearer token.
+  description: This API allows users to interact with their Allegro account.
   version: 1.0.0
 servers:
   - url: http://localhost:8080/allegro
