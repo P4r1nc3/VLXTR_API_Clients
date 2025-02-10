@@ -27,13 +27,42 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Build and Verify
+      - name: Build all modules
         run: mvn clean verify
 
-  deploy:
-    name: Deploy to GitHub Packages
-    needs: build
-    if: github.event_name == 'push'
+  check-changes:
+    name: Check Changes
+    runs-on: ubuntu-latest
+    outputs:
+      allegro_changed: ${{ steps.detect_changes.outputs.allegro }}
+      bambu_changed: ${{ steps.detect_changes.outputs.bambu }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in OpenAPI YAML files
+        id: detect_changes
+        run: |
+          allegro_changed="false"
+          bambu_changed="false"
+
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-allegro-api.yaml'; then
+            allegro_changed="true"
+          fi
+
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-bambu-api.yaml'; then
+            bambu_changed="true"
+          fi
+
+          echo "allegro=$allegro_changed" >> $GITHUB_ENV
+          echo "bambu=$bambu_changed" >> $GITHUB_ENV
+
+  deploy-allegro:
+    name: Deploy Allegro API
+    needs: [build, check-changes]
+    if: needs.check-changes.outputs.allegro_changed == 'true'
     runs-on: ubuntu-latest
 
     steps:
@@ -42,17 +71,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Check for changes in openapi.yaml
-        id: check_changes
-        run: |
-          if git diff --name-only HEAD^ HEAD | grep -q 'openapi.yaml'; then
-            echo "changes_detected=true" >> $GITHUB_ENV
-          else
-            echo "changes_detected=false" >> $GITHUB_ENV
-          fi
-
       - name: Set up Java and Maven
-        if: env.changes_detected == 'true'
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
@@ -61,7 +80,6 @@ jobs:
           settings-path: ${{ github.workspace }}
 
       - name: Configure GitHub Packages Authentication
-        if: env.changes_detected == 'true'
         run: |
           mkdir -p ~/.m2
           echo "<settings>
@@ -74,26 +92,77 @@ jobs:
             </servers>
           </settings>" > ~/.m2/settings.xml
 
-      - name: Increment version
-        if: env.changes_detected == 'true'
+      - name: Increment version for Allegro API
         run: |
-          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
           NEW_VERSION="$major.$((minor + 1)).0"
-          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
       - name: Commit updated version
-        if: env.changes_detected == 'true'
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          git add pom.xml
-          git commit -m "chore: Bump version to $NEW_VERSION [skip ci]"
+          git add vlxtr-allegro-api/pom.xml
+          git commit -m "chore: Bump Allegro API version to $NEW_VERSION [skip ci]"
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
 
-      - name: Deploy to GitHub Packages
-        if: env.changes_detected == 'true'
-        run: mvn clean deploy
+      - name: Deploy Allegro API
+        run: mvn clean deploy -pl vlxtr-allegro-api
+        env:
+          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+
+  deploy-bambu:
+    name: Deploy Bambu API
+    needs: [build, check-changes]
+    if: needs.check-changes.outputs.bambu_changed == 'true'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ secrets.TOKEN_GITHUB }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Increment version for Bambu API
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-bambu-api -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+          NEW_VERSION="$major.$((minor + 1)).0"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-bambu-api
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add vlxtr-bambu-api/pom.xml
+          git commit -m "chore: Bump Bambu API version to $NEW_VERSION [skip ci]"
+          git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
+
+      - name: Deploy Bambu API
+        run: mvn clean deploy -pl vlxtr-bambu-api
         env:
           GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
