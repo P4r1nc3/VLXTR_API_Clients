@@ -3,13 +3,20 @@ info:
   title: VLXTR Allegro API
   description: This API allows users to interact with their Allegro account.
   version: 1.0.0
+
 servers:
   - url: http://localhost:8080
     description: Local development server
 
+tags:
+  - name: Offers
+    description: Endpoints related to managing and retrieving Allegro offers.
+
 paths:
   /allegro/offers:
     get:
+      tags:
+        - Offers
       summary: Retrieve a list of offers from Allegro
       description: Fetches offers available in Allegro based on the provided authorization token.
       operationId: getOffers
