@@ -6,11 +6,7 @@
   <artifactId>vlxtr-openapi</artifactId>
   <packaging>pom</packaging>
   <name>vlxtr-openapi</name>
-  <version>${revision}</version>
-
-  <properties>
-    <revision>1.0.0</revision>
-  </properties>
+  <version>1.0.0</version>
 
   <modules>
     <module>vlxtr-allegro-api</module>
