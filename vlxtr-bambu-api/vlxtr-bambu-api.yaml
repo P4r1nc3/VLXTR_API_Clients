@@ -3,23 +3,31 @@ info:
   title: VLXTR Bambu API v1
   description: Bambu API client for managing Bambu Lab printers.
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
   - url: http://localhost:8000
     description: Local development server
+
+security:
+  - bearerAuth: []
 
 tags:
   - name: Printers
     description: Endpoints related to managing and retrieving Bambu Lab printers.
 
 paths:
-  /printers/:
+  /printers:
     get:
       tags:
         - Printers
       summary: Get All Printers
       description: Retrieves a list of all registered Bambu Lab printers.
       operationId: getPrinters
+      security:
+        - bearerAuth: []
       responses:
         '200':
           description: Successful response with a list of printers.
@@ -29,6 +37,10 @@ paths:
                 type: array
                 items:
                   $ref: '#/components/schemas/Printer'
+        '400':
+          description: Bad request - Invalid parameters.
+        '401':
+          description: Unauthorized - Invalid or missing authentication token.
 
     post:
       tags:
@@ -36,6 +48,8 @@ paths:
       summary: Add Printer
       description: Registers a new Bambu Lab printer in the system.
       operationId: addPrinter
+      security:
+        - bearerAuth: []
       requestBody:
         content:
           application/json:
@@ -49,14 +63,20 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Printer'
+        '400':
+          description: Bad request - Invalid input data.
+        '401':
+          description: Unauthorized - Invalid or missing authentication token.
 
-  '/printers/{serial}':
+  /printers/{serial}:
     get:
       tags:
         - Printers
       summary: Get Printer
       description: Retrieves details of a specific Bambu Lab printer based on its serial number.
       operationId: getPrinter
+      security:
+        - bearerAuth: []
       parameters:
         - name: serial
           in: path
@@ -71,6 +91,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Printer'
+        '400':
+          description: Bad request - Invalid serial number format.
+        '401':
+          description: Unauthorized - Invalid or missing authentication token.
         '404':
           description: Printer not found.
 
@@ -80,6 +104,8 @@ paths:
       summary: Update Printer
       description: Updates the details of a specific printer using its serial number.
       operationId: updatePrinter
+      security:
+        - bearerAuth: []
       parameters:
         - name: serial
           in: path
@@ -100,6 +126,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Printer'
+        '400':
+          description: Bad request - Invalid input data.
+        '401':
+          description: Unauthorized - Invalid or missing authentication token.
         '404':
           description: Printer not found.
 
@@ -109,6 +139,8 @@ paths:
       summary: Delete Printer
       description: Removes a printer from the system using its serial number.
       operationId: deletePrinter
+      security:
+        - bearerAuth: []
       parameters:
         - name: serial
           in: path
@@ -119,10 +151,20 @@ paths:
       responses:
         '204':
           description: Printer successfully deleted.
+        '400':
+          description: Bad request - Invalid serial number format.
+        '401':
+          description: Unauthorized - Invalid or missing authentication token.
         '404':
           description: Printer not found.
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Printer:
       type: object

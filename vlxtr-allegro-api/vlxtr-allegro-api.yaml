@@ -3,10 +3,16 @@ info:
   title: VLXTR Allegro API v1
   description: Allegro API client for managing Allegro account.
   version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
 
 servers:
   - url: http://localhost:8080
     description: Local development server
+
+security:
+  - bearerAuth: []
 
 tags:
   - name: Offers
@@ -20,6 +26,8 @@ paths:
       summary: Retrieve a list of offers from Allegro
       description: Fetches offers available in Allegro based on the provided authorization token.
       operationId: getOffers
+      security:
+        - bearerAuth: []
       parameters:
         - name: Authorization
           in: header
@@ -40,6 +48,12 @@ paths:
           description: Internal server error.
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     OffersResponse:
       type: object
