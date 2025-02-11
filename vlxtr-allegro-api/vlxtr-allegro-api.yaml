@@ -36,15 +36,15 @@ paths:
           schema:
             type: string
       responses:
-        '200':
+        "200":
           description: Successfully retrieved offers
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/OffersResponse'
-        '401':
+                $ref: "#/components/schemas/OffersResponse"
+        "401":
           description: Unauthorized - Invalid or missing token.
-        '500':
+        "500":
           description: Internal server error.
 
 components:
@@ -61,7 +61,7 @@ components:
         offers:
           type: array
           items:
-            $ref: '#/components/schemas/Offer'
+            $ref: "#/components/schemas/Offer"
         count:
           type: integer
           description: Number of offers returned in this response
@@ -77,29 +77,29 @@ components:
         name:
           type: string
         category:
-          $ref: '#/components/schemas/Category'
+          $ref: "#/components/schemas/Category"
         primaryImage:
-          $ref: '#/components/schemas/Image'
+          $ref: "#/components/schemas/Image"
         sellingMode:
-          $ref: '#/components/schemas/SellingMode'
+          $ref: "#/components/schemas/SellingMode"
         saleInfo:
-          $ref: '#/components/schemas/SaleInfo'
+          $ref: "#/components/schemas/SaleInfo"
         stats:
-          $ref: '#/components/schemas/Stats'
+          $ref: "#/components/schemas/Stats"
         stock:
-          $ref: '#/components/schemas/Stock'
+          $ref: "#/components/schemas/Stock"
         publication:
-          $ref: '#/components/schemas/Publication'
+          $ref: "#/components/schemas/Publication"
         afterSalesServices:
-          $ref: '#/components/schemas/AfterSalesServices'
+          $ref: "#/components/schemas/AfterSalesServices"
         delivery:
-          $ref: '#/components/schemas/Delivery'
+          $ref: "#/components/schemas/Delivery"
         b2b:
-          $ref: '#/components/schemas/B2B'
+          $ref: "#/components/schemas/B2B"
         additionalMarketplaces:
           type: object
           additionalProperties:
-            $ref: '#/components/schemas/AdditionalMarketplace'
+            $ref: "#/components/schemas/AdditionalMarketplace"
 
     Category:
       type: object
@@ -119,11 +119,11 @@ components:
         format:
           type: string
         price:
-          $ref: '#/components/schemas/Price'
+          $ref: "#/components/schemas/Price"
         minimalPrice:
-          $ref: '#/components/schemas/Price'
+          $ref: "#/components/schemas/Price"
         startingPrice:
-          $ref: '#/components/schemas/Price'
+          $ref: "#/components/schemas/Price"
         priceAutomation:
           type: object
           description: Placeholder for future price automation properties
@@ -140,7 +140,7 @@ components:
       type: object
       properties:
         currentPrice:
-          $ref: '#/components/schemas/Price'
+          $ref: "#/components/schemas/Price"
         biddersCount:
           type: integer
 
@@ -178,17 +178,17 @@ components:
           type: string
           format: date-time
         marketplaces:
-          $ref: '#/components/schemas/Marketplaces'
+          $ref: "#/components/schemas/Marketplaces"
 
     Marketplaces:
       type: object
       properties:
         base:
-          $ref: '#/components/schemas/BaseMarketplace'
+          $ref: "#/components/schemas/BaseMarketplace"
         additional:
           type: array
           items:
-            $ref: '#/components/schemas/AdditionalMarketplace'
+            $ref: "#/components/schemas/AdditionalMarketplace"
 
     BaseMarketplace:
       type: object
@@ -210,7 +210,7 @@ components:
       type: object
       properties:
         shippingRates:
-          $ref: '#/components/schemas/ShippingRates'
+          $ref: "#/components/schemas/ShippingRates"
 
     ShippingRates:
       type: object
@@ -228,7 +228,7 @@ components:
       type: object
       properties:
         publication:
-          $ref: '#/components/schemas/PublicationState'
+          $ref: "#/components/schemas/PublicationState"
 
     PublicationState:
       type: object

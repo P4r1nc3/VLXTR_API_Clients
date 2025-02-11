@@ -20,8 +20,8 @@ jobs:
       - name: Set up Java and Maven
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
 
       - name: Build all modules
         run: mvn clean verify
@@ -99,8 +99,8 @@ jobs:
       - name: Set up Java and Maven
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
           server-id: github
           settings-path: ${{ github.workspace }}
 
@@ -132,7 +132,7 @@ jobs:
 
           git fetch origin master
           git checkout master
-          
+
           git stash
           git pull --rebase origin master
           git stash pop || echo "No changes to apply"
@@ -184,8 +184,8 @@ jobs:
       - name: Set up Java and Maven
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          distribution: "temurin"
+          java-version: "17"
           server-id: github
           settings-path: ${{ github.workspace }}
 
@@ -217,7 +217,7 @@ jobs:
 
           git fetch origin master
           git checkout master
-          
+
           git stash
           git pull --rebase origin master
           git stash pop || echo "No changes to apply"
