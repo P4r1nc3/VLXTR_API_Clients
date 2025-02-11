@@ -26,10 +26,29 @@ jobs:
       - name: Build all modules
         run: mvn clean verify
 
+  lint-openapi:
+    name: Lint OpenAPI Specs
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install OpenAPI CLI
+        run: npm install -g @redocly/cli
+
+      - name: Validate Allegro API OpenAPI Spec
+        run: redocly lint vlxtr-allegro-api/vlxtr-allegro-api.yaml
+
+      - name: Validate Bambu API OpenAPI Spec
+        run: redocly lint vlxtr-bambu-api/vlxtr-bambu-api.yaml
+
   check-allegro-changes:
     name: Check Allegro API Changes
     runs-on: ubuntu-latest
-    needs: build
+    needs: lint-openapi
     if: github.event_name == 'push' && success()
     outputs:
       changed: ${{ steps.detect_changes.outputs.allegro_changed }}
@@ -114,7 +133,7 @@ jobs:
   check-bambu-changes:
     name: Check Bambu API Changes
     runs-on: ubuntu-latest
-    needs: build
+    needs: lint-openapi
     if: github.event_name == 'push' && success()
     outputs:
       changed: ${{ steps.detect_changes.outputs.bambu_changed }}

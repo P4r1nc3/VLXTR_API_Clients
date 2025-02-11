@@ -1,6 +1,6 @@
 openapi: 3.0.3
 info:
-  title: VLXTR Bambu API
+  title: VLXTR Bambu API v1
   description: Bambu API client for managing Bambu Lab printers.
   version: 1.0.0
 
