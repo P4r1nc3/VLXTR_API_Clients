@@ -27,7 +27,7 @@ paths:
       description: Fetches offers available in Allegro based on the provided authorization token.
       operationId: getOffers
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: Authorization
           in: header

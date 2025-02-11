@@ -27,7 +27,7 @@ paths:
       description: Retrieves a list of all registered Bambu Lab printers.
       operationId: getPrinters
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: [ ]
       responses:
         '200':
           description: Successful response with a list of printers.
@@ -45,7 +45,7 @@ paths:
       description: Registers a new Bambu Lab printer in the system.
       operationId: addPrinter
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: [ ]
       requestBody:
         content:
           application/json:
@@ -68,7 +68,7 @@ paths:
       description: Retrieves details of a specific Bambu Lab printer based on its serial number.
       operationId: getPrinter
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: serial
           in: path
@@ -93,7 +93,7 @@ paths:
       description: Updates the details of a specific printer using its serial number.
       operationId: updatePrinter
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: serial
           in: path
@@ -124,7 +124,7 @@ paths:
       description: Removes a printer from the system using its serial number.
       operationId: deletePrinter
       security:
-        - BearerAuth: [ ]
+        - bearerAuth: [ ]
       parameters:
         - name: serial
           in: path
