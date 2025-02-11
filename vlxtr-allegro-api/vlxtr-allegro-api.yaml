@@ -19,7 +19,7 @@ tags:
     description: Endpoints related to managing and retrieving Allegro offers.
 
 paths:
-  /allegro/offers:
+  /offers:
     get:
       tags:
         - Offers
