@@ -11,6 +11,9 @@ servers:
   - url: http://localhost:8000
     description: Local development server
 
+security:
+  - bearerAuth: []
+
 tags:
   - name: Printers
     description: Endpoints related to managing and retrieving Bambu Lab printers.
@@ -136,6 +139,12 @@ paths:
           description: Printer not found.
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Printer:
       type: object
