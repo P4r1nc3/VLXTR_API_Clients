@@ -45,10 +45,26 @@ jobs:
       - name: Validate Bambu API OpenAPI Spec
         run: redocly lint vlxtr-bambu-api/vlxtr-bambu-api.yaml --config .redocly.yaml
 
+  format-check:
+    name: Check YAML Formatting with Prettier
+    runs-on: ubuntu-latest
+    needs: lint-openapi
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Install Prettier
+        run: npm install -g prettier
+
+      - name: Check YAML formatting
+        run: prettier --check "**/*.yaml"
+
   check-allegro-changes:
     name: Check Allegro API Changes
     runs-on: ubuntu-latest
-    needs: lint-openapi
+    needs: format-check
     if: github.event_name == 'push' && success()
     outputs:
       changed: ${{ steps.detect_changes.outputs.allegro_changed }}
@@ -133,7 +149,7 @@ jobs:
   check-bambu-changes:
     name: Check Bambu API Changes
     runs-on: ubuntu-latest
-    needs: lint-openapi
+    needs: format-check
     if: github.event_name == 'push' && success()
     outputs:
       changed: ${{ steps.detect_changes.outputs.bambu_changed }}
