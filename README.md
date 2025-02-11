@@ -20,7 +20,7 @@ Ensure the `pom.xml` file in the **parent project** includes the correct reposit
 <distributionManagement>
     <repository>
         <id>github</id>
-        <url>https://maven.pkg.github.com/P4r1nc3/VLXTR_OpenAPI</url>
+        <url>https://maven.pkg.github.com/P4r1nc3/VLXTR_API_Clients</url>
     </repository>
 </distributionManagement>
 ```
@@ -33,13 +33,18 @@ Add GitHub credentials to `settings.xml` located at:
 - **Windows**: `C:\Users\your-user\.m2\settings.xml`
 
 ```xml
-<servers>
-    <server>
-        <id>github</id>
-        <username>YOUR_GITHUB_USERNAME</username>
-        <password>YOUR_GITHUB_PERSONAL_ACCESS_TOKEN</password>
-    </server>
-</servers>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+          https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>YOUR_GITHUB_USERNAME</username>
+            <password>YOUR_GITHUB_PERSONAL_ACCESS_TOKEN</password>
+        </server>
+    </servers>
+</settings>
 ```
 
 ### **3. Deploy Each Module Separately**
@@ -87,13 +92,18 @@ To use these packages in another project, add the following configurations.
 Users must also add their credentials in `~/.m2/settings.xml` to authenticate when pulling the package:
 
 ```xml
-<servers>
-    <server>
-        <id>github</id>
-        <username>YOUR_GITHUB_USERNAME</username>
-        <password>YOUR_GITHUB_PERSONAL_ACCESS_TOKEN</password>
-    </server>
-</servers>
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
+          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+          https://maven.apache.org/xsd/settings-1.0.0.xsd">
+    <servers>
+        <server>
+            <id>github</id>
+            <username>YOUR_GITHUB_USERNAME</username>
+            <password>YOUR_GITHUB_PERSONAL_ACCESS_TOKEN</password>
+        </server>
+    </servers>
+</settings>
 ```
 
 ---
