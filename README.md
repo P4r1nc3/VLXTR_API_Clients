@@ -67,7 +67,7 @@ To use these packages in another project, add the following configurations.
 <repositories>
     <repository>
         <id>github</id>
-        <url>https://maven.pkg.github.com/P4r1nc3/VLXTR_OpenAPI</url>
+        <url>https://maven.pkg.github.com/P4r1nc3/VLXTR_API_Clients</url>
     </repository>
 </repositories>
 ```
@@ -79,15 +79,6 @@ To use these packages in another project, add the following configurations.
 <dependency>
     <groupId>com.p4r1nc3.vlxtr</groupId>
     <artifactId>vlxtr-allegro-api</artifactId>
-    <version>1.0-SNAPSHOT</version>
-</dependency>
-```
-
-#### **Using VLXTR Bambu API**
-```xml
-<dependency>
-    <groupId>com.p4r1nc3.vlxtr</groupId>
-    <artifactId>vlxtr-bambu-api</artifactId>
     <version>1.0-SNAPSHOT</version>
 </dependency>
 ```
