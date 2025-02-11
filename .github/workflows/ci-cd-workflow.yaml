@@ -94,10 +94,13 @@ jobs:
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
-          
+
           git fetch origin master
           git checkout master
+          
+          git stash
           git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
 
           git add vlxtr-allegro-api/pom.xml
           git commit -m "Bump Allegro API client version to $NEW_VERSION"
@@ -179,7 +182,10 @@ jobs:
 
           git fetch origin master
           git checkout master
+          
+          git stash
           git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
 
           git add vlxtr-bambu-api/pom.xml
           git commit -m "Bump Bambu API client version to $NEW_VERSION"
