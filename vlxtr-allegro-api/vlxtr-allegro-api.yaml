@@ -86,6 +86,7 @@ paths:
       summary: Retrieve authentication token
       description: Provides an access token for authentication.
       operationId: getToken
+      security: [ ]
       responses:
         "200":
           description: Successfully retrieved token
@@ -93,6 +94,42 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenResponse"
+        "500":
+          description: Internal server error.
+
+  /tokens/callback:
+    get:
+      tags:
+        - Tokens
+      summary: Handle authorization callback
+      description: Handles the authorization callback and returns a token response.
+      operationId: handleTokenCallback
+      security: [ ]
+      responses:
+        "200":
+          description: Successfully handled authorization callback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "500":
+          description: Internal server error.
+
+  /tokens/link:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve authorization link
+      description: Returns an authorization link for authentication.
+      operationId: getAuthorizationLink
+      security: [ ]
+      responses:
+        "200":
+          description: Successfully retrieved authorization link
+          content:
+            application/json:
+              schema:
+                type: string
         "500":
           description: Internal server error.
 
