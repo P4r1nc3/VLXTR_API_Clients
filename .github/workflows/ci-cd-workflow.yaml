@@ -40,10 +40,10 @@ jobs:
         run: npm install -g @redocly/cli
 
       - name: Validate Allegro API OpenAPI Spec
-        run: redocly lint vlxtr-allegro-api/vlxtr-allegro-api.yaml
+        run: redocly lint vlxtr-allegro-api/vlxtr-allegro-api.yaml --config .redocly.yaml
 
       - name: Validate Bambu API OpenAPI Spec
-        run: redocly lint vlxtr-bambu-api/vlxtr-bambu-api.yaml
+        run: redocly lint vlxtr-bambu-api/vlxtr-bambu-api.yaml --config .redocly.yaml
 
   check-allegro-changes:
     name: Check Allegro API Changes
