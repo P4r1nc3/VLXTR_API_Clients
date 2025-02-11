@@ -86,7 +86,7 @@ paths:
       summary: Retrieve authentication token
       description: Provides an access token for authentication.
       operationId: getToken
-      security: [ ]
+      security: []
       responses:
         "200":
           description: Successfully retrieved token
@@ -104,7 +104,7 @@ paths:
       summary: Handle authorization callback
       description: Handles the authorization callback and returns a token response.
       operationId: handleTokenCallback
-      security: [ ]
+      security: []
       responses:
         "200":
           description: Successfully handled authorization callback
@@ -122,7 +122,7 @@ paths:
       summary: Retrieve authorization link
       description: Returns an authorization link for authentication.
       operationId: getAuthorizationLink
-      security: [ ]
+      security: []
       responses:
         "200":
           description: Successfully retrieved authorization link
