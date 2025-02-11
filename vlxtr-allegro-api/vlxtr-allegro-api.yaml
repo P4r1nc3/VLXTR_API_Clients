@@ -17,9 +17,11 @@ security:
 tags:
   - name: Offers
     description: Endpoints related to managing and retrieving Allegro offers.
+  - name: Tokens
+    description: Endpoints related to authentication tokens.
 
 paths:
-  /allegro/offers:
+  /offers:
     get:
       tags:
         - Offers
@@ -44,6 +46,90 @@ paths:
                 $ref: "#/components/schemas/OffersResponse"
         "401":
           description: Unauthorized - Invalid or missing token.
+        "500":
+          description: Internal server error.
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - Offers
+      summary: Retrieve a specific offer
+      description: Fetches a single offer based on the provided offer ID.
+      operationId: getOfferById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          description: The ID of the offer to retrieve
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved the offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Offer"
+        "401":
+          description: Unauthorized - Invalid or missing token.
+        "404":
+          description: Offer not found.
+        "500":
+          description: Internal server error.
+
+  /tokens:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve authentication token
+      description: Provides an access token for authentication.
+      operationId: getToken
+      security: []
+      responses:
+        "200":
+          description: Successfully retrieved token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "500":
+          description: Internal server error.
+
+  /tokens/callback:
+    get:
+      tags:
+        - Tokens
+      summary: Handle authorization callback
+      description: Handles the authorization callback and returns a token response.
+      operationId: handleTokenCallback
+      security: []
+      responses:
+        "200":
+          description: Successfully handled authorization callback
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "500":
+          description: Internal server error.
+
+  /tokens/link:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve authorization link
+      description: Returns an authorization link for authentication.
+      operationId: getAuthorizationLink
+      security: []
+      responses:
+        "200":
+          description: Successfully retrieved authorization link
+          content:
+            application/json:
+              schema:
+                type: string
         "500":
           description: Internal server error.
 
@@ -235,3 +321,21 @@ components:
       properties:
         state:
           type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        scope:
+          type: string
+        iss:
+          type: string
+        jti:
+          type: string
+        access_token:
+          type: string
+        token_type:
+          type: string
+        expires_in:
+          type: integer
+        allegro_api:
+          type: boolean
