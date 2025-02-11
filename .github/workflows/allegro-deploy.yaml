@@ -4,10 +4,6 @@ on:
   push:
     branches:
       - master
-  workflow_run:
-    workflows: [ "Build Check" ]
-    types:
-      - completed
 
 jobs:
   check-changes:
@@ -68,7 +64,7 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_VERSION="$major.$((minor + 1)).0"
+          NEW_VERSION="$major.$minor.$((patch + 1))"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
