@@ -76,7 +76,7 @@ jobs:
           git pull --rebase https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git master
           git stash pop || echo "No changes to pop from stash"
           git add vlxtr-bambu-api/pom.xml
-          git commit -m "chore: Bump Bambu API version to $NEW_VERSION [skip ci]"
+          git commit -m "Bump Bambu API version to $NEW_VERSION"
           git push https://x-access-token:${{ secrets.TOKEN_GITHUB }}@github.com/${{ github.repository }}.git HEAD:master
 
       - name: Deploy Bambu API
