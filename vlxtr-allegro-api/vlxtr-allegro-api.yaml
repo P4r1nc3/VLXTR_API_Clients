@@ -198,6 +198,102 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/AdditionalMarketplace"
 
+    Category:
+      type: object
+      properties:
+        id:
+          type: string
+
+    Image:
+      type: object
+      properties:
+        url:
+          type: string
+
+    SellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+        price:
+          $ref: "#/components/schemas/Price"
+
+    Price:
+      type: object
+      properties:
+        amount:
+          type: string
+        currency:
+          type: string
+
+    SaleInfo:
+      type: object
+      properties:
+        currentPrice:
+          $ref: "#/components/schemas/Price"
+        biddersCount:
+          type: integer
+
+    Stats:
+      type: object
+      properties:
+        watchersCount:
+          type: integer
+        visitsCount:
+          type: integer
+
+    Stock:
+      type: object
+      properties:
+        available:
+          type: integer
+        sold:
+          type: integer
+
+    Publication:
+      type: object
+      properties:
+        status:
+          type: string
+        startingAt:
+          type: string
+          format: date-time
+        endingAt:
+          type: string
+          format: date-time
+
+    AfterSalesServices:
+      type: object
+      properties:
+        warranty:
+          type: object
+        returnPolicy:
+          type: object
+
+    Delivery:
+      type: object
+      properties:
+        shippingRates:
+          type: string
+
+    B2B:
+      type: object
+      properties:
+        buyableOnlyByBusiness:
+          type: boolean
+
+    AdditionalMarketplace:
+      type: object
+      properties:
+        publication:
+          $ref: "#/components/schemas/PublicationState"
+
+    PublicationState:
+      type: object
+      properties:
+        state:
+          type: string
+
     TokenRegister:
       type: object
       properties:
@@ -219,11 +315,8 @@ components:
       properties:
         accessToken:
           type: string
-          description: The active access token.
         refreshToken:
           type: string
-          description: The refresh token used to generate new access tokens.
         expiresAt:
           type: string
           format: date-time
-          description: The expiration timestamp of the access token.
