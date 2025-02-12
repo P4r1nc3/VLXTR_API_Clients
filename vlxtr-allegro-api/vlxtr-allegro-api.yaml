@@ -30,13 +30,6 @@ paths:
       operationId: getOffers
       security:
         - bearerAuth: []
-      parameters:
-        - name: Authorization
-          in: header
-          required: true
-          description: Bearer token for authentication
-          schema:
-            type: string
       responses:
         "200":
           description: Successfully retrieved offers
@@ -84,21 +77,9 @@ paths:
       tags:
         - Tokens
       summary: Register a new authentication token
-      description: Registers a new authentication token using device code authorization flow.
+      description: Registers a new authentication token using the device code authorization flow.
       operationId: registerToken
       security: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                device_code:
-                  type: string
-                  description: Device code obtained from Allegro API.
-              required:
-                - device_code
       responses:
         "200":
           description: Successfully registered token
@@ -106,6 +87,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TokenRegister"
+        "500":
+          description: Internal server error.
+
+  /tokens/{deviceCode}:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve stored access token
+      description: Returns the access token for a given deviceCode if it is still valid.
+      operationId: getToken
+      parameters:
+        - name: deviceCode
+          in: path
+          required: true
+          description: The device code associated with the token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "404":
+          description: Token not found.
+        "500":
+          description: Internal server error.
+
+  /tokens/{deviceCode}/refresh:
+    post:
+      tags:
+        - Tokens
+      summary: Refresh authentication token
+      description: Uses the refresh token to obtain a new access token.
+      operationId: refreshToken
+      parameters:
+        - name: deviceCode
+          in: path
+          required: true
+          description: The device code associated with the token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully refreshed token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "400":
+          description: Invalid refresh token.
+        "404":
+          description: Token not found.
         "500":
           description: Internal server error.
 
@@ -163,141 +198,6 @@ components:
           additionalProperties:
             $ref: "#/components/schemas/AdditionalMarketplace"
 
-    Category:
-      type: object
-      properties:
-        id:
-          type: string
-
-    Image:
-      type: object
-      properties:
-        url:
-          type: string
-
-    SellingMode:
-      type: object
-      properties:
-        format:
-          type: string
-        price:
-          $ref: "#/components/schemas/Price"
-        minimalPrice:
-          $ref: "#/components/schemas/Price"
-        startingPrice:
-          $ref: "#/components/schemas/Price"
-        priceAutomation:
-          type: object
-          description: Placeholder for future price automation properties
-
-    Price:
-      type: object
-      properties:
-        amount:
-          type: string
-        currency:
-          type: string
-
-    SaleInfo:
-      type: object
-      properties:
-        currentPrice:
-          $ref: "#/components/schemas/Price"
-        biddersCount:
-          type: integer
-
-    Stats:
-      type: object
-      properties:
-        watchersCount:
-          type: integer
-        visitsCount:
-          type: integer
-
-    Stock:
-      type: object
-      properties:
-        available:
-          type: integer
-        sold:
-          type: integer
-
-    Publication:
-      type: object
-      properties:
-        status:
-          type: string
-        startingAt:
-          type: string
-          format: date-time
-        startedAt:
-          type: string
-          format: date-time
-        endingAt:
-          type: string
-          format: date-time
-        endedAt:
-          type: string
-          format: date-time
-        marketplaces:
-          $ref: "#/components/schemas/Marketplaces"
-
-    Marketplaces:
-      type: object
-      properties:
-        base:
-          $ref: "#/components/schemas/BaseMarketplace"
-        additional:
-          type: array
-          items:
-            $ref: "#/components/schemas/AdditionalMarketplace"
-
-    BaseMarketplace:
-      type: object
-      properties:
-        id:
-          type: string
-
-    AfterSalesServices:
-      type: object
-      properties:
-        warranty:
-          type: object
-        returnPolicy:
-          type: object
-        impliedWarranty:
-          type: object
-
-    Delivery:
-      type: object
-      properties:
-        shippingRates:
-          $ref: "#/components/schemas/ShippingRates"
-
-    ShippingRates:
-      type: object
-      properties:
-        id:
-          type: string
-
-    B2B:
-      type: object
-      properties:
-        buyableOnlyByBusiness:
-          type: boolean
-
-    AdditionalMarketplace:
-      type: object
-      properties:
-        publication:
-          $ref: "#/components/schemas/PublicationState"
-
-    PublicationState:
-      type: object
-      properties:
-        state:
-          type: string
-
     TokenRegister:
       type: object
       properties:
@@ -313,3 +213,17 @@ components:
           type: string
         verification_uri_complete:
           type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+          description: The active access token.
+        refreshToken:
+          type: string
+          description: The refresh token used to generate new access tokens.
+        expiresAt:
+          type: string
+          format: date-time
+          description: The expiration timestamp of the access token.
