@@ -301,6 +301,6 @@ components:
       value:
         status: 404
         error: "Not Found"
-        cause: "The requested offer does not exist."
-        action: "Verify the Offer ID and try again."
+        cause: "The requested printer does not exist."
+        action: "Verify printer serial number and try again."
         correlationId: "d1608b4c-3baf-4be6-a637-76c833582575"
