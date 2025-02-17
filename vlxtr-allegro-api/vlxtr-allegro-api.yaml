@@ -274,6 +274,12 @@ components:
       type: object
       properties:
         shippingRates:
+          $ref: "#/components/schemas/ShippingRates"
+
+    ShippingRates:
+      type: object
+      properties:
+        id:
           type: string
 
     B2B:
