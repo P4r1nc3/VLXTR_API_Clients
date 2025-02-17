@@ -36,7 +36,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/OffersResponse"
+                $ref: "#/components/schemas/OffersListResponse"
         "401":
           description: Unauthorized - Invalid or missing token.
         "500":
@@ -64,7 +64,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Offer"
+                $ref: "#/components/schemas/OfferDetailsResponse"
         "401":
           description: Unauthorized - Invalid or missing token.
         "404":
@@ -152,154 +152,6 @@ components:
       bearerFormat: JWT
 
   schemas:
-    OffersResponse:
-      type: object
-      properties:
-        offers:
-          type: array
-          items:
-            $ref: "#/components/schemas/Offer"
-        count:
-          type: integer
-          description: Number of offers returned in this response
-        totalCount:
-          type: integer
-          description: Total number of available offers
-
-    Offer:
-      type: object
-      properties:
-        id:
-          type: string
-        name:
-          type: string
-        category:
-          $ref: "#/components/schemas/Category"
-        primaryImage:
-          $ref: "#/components/schemas/Image"
-        sellingMode:
-          $ref: "#/components/schemas/SellingMode"
-        saleInfo:
-          $ref: "#/components/schemas/SaleInfo"
-        stats:
-          $ref: "#/components/schemas/Stats"
-        stock:
-          $ref: "#/components/schemas/Stock"
-        publication:
-          $ref: "#/components/schemas/Publication"
-        afterSalesServices:
-          $ref: "#/components/schemas/AfterSalesServices"
-        delivery:
-          $ref: "#/components/schemas/Delivery"
-        b2b:
-          $ref: "#/components/schemas/B2B"
-        additionalMarketplaces:
-          type: object
-          additionalProperties:
-            $ref: "#/components/schemas/AdditionalMarketplace"
-
-    Category:
-      type: object
-      properties:
-        id:
-          type: string
-
-    Image:
-      type: object
-      properties:
-        url:
-          type: string
-
-    SellingMode:
-      type: object
-      properties:
-        format:
-          type: string
-        price:
-          $ref: "#/components/schemas/Price"
-
-    Price:
-      type: object
-      properties:
-        amount:
-          type: string
-        currency:
-          type: string
-
-    SaleInfo:
-      type: object
-      properties:
-        currentPrice:
-          $ref: "#/components/schemas/Price"
-        biddersCount:
-          type: integer
-
-    Stats:
-      type: object
-      properties:
-        watchersCount:
-          type: integer
-        visitsCount:
-          type: integer
-
-    Stock:
-      type: object
-      properties:
-        available:
-          type: integer
-        sold:
-          type: integer
-
-    Publication:
-      type: object
-      properties:
-        status:
-          type: string
-        startingAt:
-          type: string
-          format: date-time
-        endingAt:
-          type: string
-          format: date-time
-
-    AfterSalesServices:
-      type: object
-      properties:
-        warranty:
-          type: object
-        returnPolicy:
-          type: object
-
-    Delivery:
-      type: object
-      properties:
-        shippingRates:
-          $ref: "#/components/schemas/ShippingRates"
-
-    ShippingRates:
-      type: object
-      properties:
-        id:
-          type: string
-
-    B2B:
-      type: object
-      properties:
-        buyableOnlyByBusiness:
-          type: boolean
-
-    AdditionalMarketplace:
-      type: object
-      properties:
-        publication:
-          $ref: "#/components/schemas/PublicationState"
-
-    PublicationState:
-      type: object
-      properties:
-        state:
-          type: string
-
     TokenRegister:
       type: object
       properties:
@@ -324,3 +176,548 @@ components:
         expiresAt:
           type: string
           format: date-time
+
+    OffersListResponse:
+      type: object
+      description: Response from GET /offers, containing a list of simplified offers.
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferListItem"
+        count:
+          type: integer
+          description: Number of offers returned in this response
+        totalCount:
+          type: integer
+          description: Total number of available offers
+
+    OfferListItem:
+      type: object
+      description: Single offer item in the list response.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          $ref: "#/components/schemas/OfferCategory"
+        primaryImage:
+          $ref: "#/components/schemas/OfferImage"
+        sellingMode:
+          $ref: "#/components/schemas/OfferListSellingMode"
+        saleInfo:
+          $ref: "#/components/schemas/OfferListSaleInfo"
+        stats:
+          $ref: "#/components/schemas/OfferListStats"
+        stock:
+          $ref: "#/components/schemas/OfferListStock"
+        publication:
+          $ref: "#/components/schemas/OfferListPublication"
+        afterSalesServices:
+          $ref: "#/components/schemas/OfferAfterSalesServices"
+        additionalServices:
+          type: object
+          nullable: true
+        external:
+          type: object
+          nullable: true
+        delivery:
+          $ref: "#/components/schemas/OfferListDelivery"
+        b2b:
+          $ref: "#/components/schemas/OfferListB2B"
+        fundraisingCampaign:
+          type: object
+          nullable: true
+        additionalMarketplaces:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplaces"
+
+    OfferCategory:
+      type: object
+      description: Category information for an offer.
+      properties:
+        id:
+          type: string
+
+    OfferImage:
+      type: object
+      description: Primary image information for an offer.
+      properties:
+        url:
+          type: string
+
+    OfferListSellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+          example: "BUY_NOW"
+        price:
+          $ref: "#/components/schemas/OfferPrice"
+        minimalPrice:
+          type: number
+          nullable: true
+        startingPrice:
+          type: number
+          nullable: true
+        priceAutomation:
+          type: object
+          nullable: true
+
+    OfferPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "14.99"
+        currency:
+          type: string
+          example: "PLN"
+
+    OfferListSaleInfo:
+      type: object
+      properties:
+        currentPrice:
+          type: object
+          nullable: true
+          description: For auctions, if present, it contains the current highest bid price
+        biddersCount:
+          type: integer
+
+    OfferListStats:
+      type: object
+      properties:
+        watchersCount:
+          type: integer
+        visitsCount:
+          type: integer
+
+    OfferListStock:
+      type: object
+      properties:
+        available:
+          type: integer
+        sold:
+          type: integer
+
+    OfferListPublication:
+      type: object
+      description: Publication details in list response.
+      properties:
+        status:
+          type: string
+          example: "INACTIVE"
+        startingAt:
+          type: string
+          format: date-time
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endingAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        marketplaces:
+          $ref: "#/components/schemas/OfferListPublicationMarketplaces"
+
+    OfferListPublicationMarketplaces:
+      type: object
+      properties:
+        base:
+          type: object
+          properties:
+            id:
+              type: string
+        additional:
+          type: array
+          items:
+            type: object
+
+    OfferAfterSalesServices:
+      type: object
+      description: After sales services such as warranty or return policy.
+      properties:
+        warranty:
+          type: object
+          nullable: true
+        returnPolicy:
+          type: object
+          nullable: true
+        impliedWarranty:
+          type: object
+          nullable: true
+
+    OfferListDelivery:
+      type: object
+      properties:
+        shippingRates:
+          $ref: "#/components/schemas/OfferListShippingRates"
+
+    OfferListShippingRates:
+      type: object
+      properties:
+        id:
+          type: string
+
+    OfferListB2B:
+      type: object
+      properties:
+        buyableOnlyByBusiness:
+          type: boolean
+
+    OfferListAdditionalMarketplaces:
+      type: object
+      description: Additional marketplaces info in list response.
+      properties:
+        allegro-cz:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
+        allegro-business-cz:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
+        allegro-sk:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
+        allegro-hu:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
+
+    OfferListAdditionalMarketplacesItem:
+      type: object
+      properties:
+        publication:
+          type: object
+          properties:
+            state:
+              type: string
+              example: "NOT_REQUESTED"
+
+    OfferDetailsResponse:
+      type: object
+      description: Response from GET /offers/{offerId}, containing detailed offer data.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productSet:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferProductSetItem"
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferParameter"
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        afterSalesServices:
+          $ref: "#/components/schemas/OfferAfterSalesServices"
+        payments:
+          $ref: "#/components/schemas/OfferPayments"
+        sellingMode:
+          $ref: "#/components/schemas/OfferDetailsSellingMode"
+        stock:
+          $ref: "#/components/schemas/OfferDetailsStock"
+        location:
+          $ref: "#/components/schemas/OfferLocation"
+        delivery:
+          $ref: "#/components/schemas/OfferDetailsDelivery"
+        description:
+          $ref: "#/components/schemas/OfferDescription"
+        external:
+          type: object
+          nullable: true
+        category:
+          $ref: "#/components/schemas/OfferCategory"
+        taxSettings:
+          type: object
+          nullable: true
+        sizeTable:
+          type: object
+          nullable: true
+        discounts:
+          type: object
+          properties:
+            wholesalePriceList:
+              type: object
+              nullable: true
+          nullable: true
+        contact:
+          type: object
+          nullable: true
+        fundraisingCampaign:
+          type: object
+          nullable: true
+        messageToSellerSettings:
+          type: object
+          nullable: true
+        attachments:
+          type: array
+          items:
+            type: object
+        b2b:
+          type: object
+          nullable: true
+        additionalServices:
+          type: object
+          nullable: true
+        compatibilityList:
+          type: object
+          nullable: true
+        additionalMarketplaces:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplaces"
+        warnings:
+          type: array
+          items:
+            type: object
+        language:
+          type: string
+        publication:
+          $ref: "#/components/schemas/OfferDetailsPublication"
+        validation:
+          $ref: "#/components/schemas/OfferValidation"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OfferProductSetItem:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/OfferProduct"
+        quantity:
+          type: object
+          properties:
+            value:
+              type: integer
+        responsiblePerson:
+          type: object
+          nullable: true
+        responsibleProducer:
+          type: object
+          nullable: true
+        safetyInformation:
+          type: object
+          nullable: true
+        marketedBeforeGPSRObligation:
+          type: boolean
+
+    OfferProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        publication:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "NOT_LISTED"
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferParameter"
+
+    OfferParameter:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        values:
+          type: array
+          items:
+            type: string
+        valuesIds:
+          type: array
+          items:
+            type: string
+          nullable: true
+        rangeValue:
+          type: object
+          nullable: true
+
+    OfferPayments:
+      type: object
+      properties:
+        invoice:
+          type: string
+          example: "NO_INVOICE"
+
+    OfferDetailsSellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+        price:
+          $ref: "#/components/schemas/OfferPrice"
+        startingPrice:
+          type: number
+          nullable: true
+        minimalPrice:
+          type: number
+          nullable: true
+
+    OfferDetailsStock:
+      type: object
+      properties:
+        available:
+          type: integer
+        unit:
+          type: string
+          example: "UNIT"
+
+    OfferLocation:
+      type: object
+      properties:
+        countryCode:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        postCode:
+          type: string
+
+    OfferDetailsDelivery:
+      type: object
+      properties:
+        shippingRates:
+          $ref: "#/components/schemas/OfferListShippingRates"
+        handlingTime:
+          type: string
+          description: ISO 8601 duration, e.g. "PT0S"
+        additionalInfo:
+          type: string
+          nullable: true
+        shipmentDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    OfferDescription:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferDescriptionSection"
+
+    OfferDescriptionSection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferDescriptionItem"
+
+    OfferDescriptionItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [TEXT, IMAGE]
+        content:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
+
+    OfferDetailsAdditionalMarketplaces:
+      type: object
+      properties:
+        allegro-sk:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
+        allegro-cz:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
+        allegro-hu:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
+        allegro-business-cz:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
+
+    OfferDetailsAdditionalMarketplace:
+      type: object
+      properties:
+        sellingMode:
+          type: object
+          nullable: true
+        publication:
+          type: object
+          properties:
+            state:
+              type: string
+            refusalReasons:
+              type: array
+              items:
+                type: object
+
+    OfferDetailsPublication:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "INACTIVE"
+        duration:
+          type: string
+          format: duration
+          example: "PT720H"
+        endedBy:
+          type: string
+          nullable: true
+        endingAt:
+          type: string
+          format: date-time
+          nullable: true
+        startingAt:
+          type: string
+          format: date-time
+          nullable: true
+        republish:
+          type: boolean
+        marketplaces:
+          $ref: "#/components/schemas/OfferListPublicationMarketplaces"
+
+    OfferValidation:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferValidationMessage"
+        warnings:
+          type: array
+          items:
+            type: object
+        validatedAt:
+          type: string
+          format: date-time
+
+    OfferValidationMessage:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+        path:
+          type: string
+          nullable: true
+        userMessage:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
