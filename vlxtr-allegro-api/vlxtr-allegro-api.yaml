@@ -585,10 +585,12 @@ components:
           items:
             type: string
         valuesIds:
-          type: array
-          items:
-            type: string
-          nullable: true
+          oneOf:
+            - type: array
+              items:
+                type: string
+            - type: string
+            - type: "null"
         rangeValue:
           type: object
           nullable: true
