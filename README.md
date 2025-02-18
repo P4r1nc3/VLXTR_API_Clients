@@ -1,19 +1,26 @@
 # VLXTR OpenAPI Clients
 
-### **Publishing and Using VLXTR OpenAPI on GitHub Packages**
+## Overview
+VLXTR OpenAPI Clients provide Java client libraries for interacting with VLXTR microservices. These clients simplify the integration process by offering pre-configured API interactions and authentication handling.
 
-## **Prerequisites**
-Before publishing or using the package, ensure you have:
-- **Maven installed** (`mvn -version` to check)
+## Features
+- Auto-generated clients based on OpenAPI specifications
+- Authentication support using Keycloak
+- Distributed via GitHub Packages for easy inclusion in projects
+- Separate modules for each VLXTR service
+
+## Prerequisites
+- **Java 17**
+- **Maven**
 - **GitHub Personal Access Token (PAT)** with `read:packages`, `write:packages`, and `delete:packages` permissions. [Create a token here](https://github.com/settings/tokens)
 - **A valid GitHub repository** where the package is hosted
 
----
+## Configuration
 
-## **Publishing a New Version**
-After making changes to the project, follow these steps to publish the updated package.
+### 1. Publishing a New Version
+After making changes to the project, follow these steps to publish an updated package.
 
-### **1. Update `pom.xml`**
+#### **1.1 Update `pom.xml`**
 Ensure the `pom.xml` file in the **parent project** includes the correct repository configuration:
 
 ```xml
@@ -27,7 +34,7 @@ Ensure the `pom.xml` file in the **parent project** includes the correct reposit
 
 Each module (`vlxtr-allegro-api` and `vlxtr-bambu-api`) **inherits this configuration**.
 
-### **2. Configure Authentication**
+#### **1.2 Configure Authentication**
 Add GitHub credentials to `settings.xml` located at:
 - **Linux/Mac**: `~/.m2/settings.xml`
 - **Windows**: `C:\Users\your-user\.m2\settings.xml`
@@ -35,7 +42,7 @@ Add GitHub credentials to `settings.xml` located at:
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
           https://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
@@ -47,27 +54,25 @@ Add GitHub credentials to `settings.xml` located at:
 </settings>
 ```
 
-### **3. Deploy Each Module Separately**
+#### **1.3 Deploy Each Module Separately**
 Since this project has **two separate clients**, deploy them individually.
 
-#### **Deploy VLXTR Allegro API**
+##### **Deploy VLXTR Allegro API**
 ```sh
 mvn clean deploy -pl vlxtr-allegro-api
 ```
 
-#### **Deploy VLXTR Bambu API**
+##### **Deploy VLXTR Bambu API**
 ```sh
 mvn clean deploy -pl vlxtr-bambu-api
 ```
 
 Once completed, both packages will be available in GitHub Packages.
 
----
-
-## **Using VLXTR OpenAPI in Other Projects**
+## **2. Using VLXTR OpenAPI in Other Projects**
 To use these packages in another project, add the following configurations.
 
-### **1. Add GitHub Repository in `pom.xml`**
+### **2.1 Add GitHub Repository in `pom.xml`**
 ```xml
 <repositories>
     <repository>
@@ -77,7 +82,7 @@ To use these packages in another project, add the following configurations.
 </repositories>
 ```
 
-### **2. Add Dependencies for Each API**
+### **2.2 Add Dependencies for Each API**
 
 #### **Using VLXTR Allegro API**
 ```xml
@@ -88,13 +93,13 @@ To use these packages in another project, add the following configurations.
 </dependency>
 ```
 
-### **3. Ensure Authentication**
+### **2.3 Ensure Authentication**
 Users must also add their credentials in `~/.m2/settings.xml` to authenticate when pulling the package:
 
 ```xml
 <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 
+          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0
           https://maven.apache.org/xsd/settings-1.0.0.xsd">
     <servers>
         <server>
@@ -106,14 +111,22 @@ Users must also add their credentials in `~/.m2/settings.xml` to authenticate wh
 </settings>
 ```
 
----
-
-## **Where to Find the Packages?**
+## **3. Where to Find the Packages?**
 The packages will be available at:
 - **[GitHub Packages - VLXTR OpenAPI](https://github.com/P4r1nc3/VLXTR_OpenAPI/packages)**
 
 Each module is published separately and can be used independently in projects.
 
----
+## Debugging
+Enable detailed logs by modifying `logback.xml` or `application.yml`:
 
-This setup ensures that **each API is built and deployed separately while maintaining proper authentication** for usage.
+```yaml
+logging:
+  level:
+    root: INFO
+    org.springframework.web.client: DEBUG
+```
+
+## Conclusion
+VLXTR OpenAPI Clients provide easy integration with VLXTR microservices, ensuring seamless authentication and API access. Make sure to configure credentials properly and always keep dependencies up to date.
+
