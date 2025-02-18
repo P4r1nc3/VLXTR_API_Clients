@@ -439,25 +439,6 @@ components:
     OfferListAdditionalMarketplaces:
       type: object
       description: Additional marketplaces info in list response.
-      properties:
-        allegro-cz:
-          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
-        allegro-business-cz:
-          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
-        allegro-sk:
-          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
-        allegro-hu:
-          $ref: "#/components/schemas/OfferListAdditionalMarketplacesItem"
-
-    OfferListAdditionalMarketplacesItem:
-      type: object
-      properties:
-        publication:
-          type: object
-          properties:
-            state:
-              type: string
-              example: "NOT_REQUESTED"
 
     OfferDetailsResponse:
       type: object
@@ -702,31 +683,7 @@ components:
 
     OfferDetailsAdditionalMarketplaces:
       type: object
-      properties:
-        allegro-sk:
-          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
-        allegro-cz:
-          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
-        allegro-hu:
-          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
-        allegro-business-cz:
-          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplace"
-
-    OfferDetailsAdditionalMarketplace:
-      type: object
-      properties:
-        sellingMode:
-          type: object
-          nullable: true
-        publication:
-          type: object
-          properties:
-            state:
-              type: string
-            refusalReasons:
-              type: array
-              items:
-                type: object
+      description: Additional marketplaces info in details response.
 
     OfferDetailsPublication:
       type: object
