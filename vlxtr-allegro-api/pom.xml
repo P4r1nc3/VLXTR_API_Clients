@@ -14,7 +14,7 @@
   <groupId>com.p4r1nc3.vlxtr</groupId>
   <artifactId>vlxtr-allegro-api</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.2</version>
+  <version>1.2.3</version>
 
   <properties>
     <openapi.generator.version>7.11.0</openapi.generator.version>
@@ -71,6 +71,7 @@
               <output>${project.build.directory}/generated-sources/openapi</output>
               <apiPackage>com.p4r1nc3.vlxtr.allegro.api</apiPackage>
               <modelPackage>com.p4r1nc3.vlxtr.allegro.model</modelPackage>
+              <templateDirectory>${project.basedir}/../custom-templates</templateDirectory>
               <configOptions>
                 <library>okhttp-gson</library>
                 <dateLibrary>java8</dateLibrary>

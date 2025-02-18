@@ -70,6 +70,7 @@
                             <output>${project.build.directory}/generated-sources/openapi</output>
                             <apiPackage>com.p4r1nc3.vlxtr.bambu.api</apiPackage>
                             <modelPackage>com.p4r1nc3.vlxtr.bambu.model</modelPackage>
+                            <templateDirectory>${project.basedir}/../custom-templates</templateDirectory>
                             <configOptions>
                                 <library>okhttp-gson</library>
                                 <dateLibrary>java8</dateLibrary>
