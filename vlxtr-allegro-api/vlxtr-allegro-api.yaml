@@ -30,6 +30,13 @@ paths:
       operationId: getOffers
       security:
         - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
       responses:
         "200":
           description: Successfully retrieved offers
@@ -61,6 +68,12 @@ paths:
           in: path
           required: true
           description: The ID of the offer to retrieve
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
           schema:
             type: string
       responses:
@@ -114,13 +127,97 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
 
-  /tokens/{deviceCode}:
+  /tokens:
     get:
       tags:
         - Tokens
       summary: Retrieve stored access token
-      description: Returns the access token for a given deviceCode if it is still valid.
+      description: Returns the access token based on the Authorization header.
       operationId: getToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/refresh:
+    post:
+      tags:
+        - Tokens
+      summary: Refresh authentication token
+      description: Uses the refresh token to obtain a new access token.
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully refreshed token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/{deviceCode}:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve stored access token (Deprecated)
+      description: Returns the access token for a given deviceCode if it is still valid. This endpoint is deprecated.
+      operationId: getTokenDeprecated
       parameters:
         - name: deviceCode
           in: path
@@ -145,7 +242,7 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
         "404":
-          description: Offer not found
+          description: Token not found
           content:
             application/json:
               schema:
@@ -158,9 +255,9 @@ paths:
     post:
       tags:
         - Tokens
-      summary: Refresh authentication token
-      description: Uses the refresh token to obtain a new access token.
-      operationId: refreshToken
+      summary: Refresh authentication token (Deprecated)
+      description: Uses the refresh token to obtain a new access token. This endpoint is deprecated.
+      operationId: refreshTokenDeprecated
       parameters:
         - name: deviceCode
           in: path
@@ -185,7 +282,7 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
         "404":
-          description: Offer not found
+          description: Token not found
           content:
             application/json:
               schema:
