@@ -109,7 +109,7 @@ paths:
       summary: Register a new authentication token
       description: Registers a new authentication token using the device code authorization flow.
       operationId: registerToken
-      security: [ ]
+      security: []
       responses:
         "200":
           description: Successfully registered token
@@ -135,7 +135,7 @@ paths:
       description: Returns the access token based on the Authorization header.
       operationId: getToken
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: Authorization
           in: header
@@ -177,7 +177,7 @@ paths:
       description: Uses the refresh token to obtain a new access token.
       operationId: refreshToken
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: Authorization
           in: header
