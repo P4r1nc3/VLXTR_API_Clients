@@ -9,8 +9,10 @@
   <version>1.0.0</version>
 
   <modules>
+    <module>vlxtr-api-gateway</module>
     <module>vlxtr-allegro-api</module>
     <module>vlxtr-bambu-api</module>
+    <module>vlxtr-core-api</module>
   </modules>
 
   <distributionManagement>
