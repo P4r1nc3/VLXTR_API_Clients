@@ -1,7 +1,4 @@
 window.onload = function() {
-  //<editor-fold desc="Changeable Configuration Block">
-
-  // the following lines will be replaced by docker/configurator, when it runs in a docker-container
   window.ui = SwaggerUIBundle({
     urls: [
       {url: "vlxtr-allegro-api/vlxtr-allegro-api.yaml", name: "VLXTR Allegro API"},
@@ -9,6 +6,7 @@ window.onload = function() {
       {url: "vlxtr-bambu-api/vlxtr-bambu-api.yaml", name: "VLXTR Bambu API"},
       {url: "vlxtr-core-api/vlxtr-core-api.yaml", name: "VLXTR Core API"}
     ],
+    "urls.primaryName": "VLXTR Allegro API",
     dom_id: '#swagger-ui',
     deepLinking: true,
     presets: [
@@ -18,11 +16,6 @@ window.onload = function() {
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
     ],
-    layout: "StandaloneLayout",
-    displayOperationId: true,
-    filter: true,
-    withCredentials: true
+    layout: "StandaloneLayout"
   });
-
-  //</editor-fold>
 };
