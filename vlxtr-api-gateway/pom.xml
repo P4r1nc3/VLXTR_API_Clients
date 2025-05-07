@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>com.p4r1nc3.vlxtr</groupId>
+    <artifactId>vlxtr-openapi</artifactId>
+    <version>1.0.0</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+
+  <groupId>com.p4r1nc3.vlxtr</groupId>
+  <artifactId>vlxtr-api-gateway</artifactId>
+  <packaging>jar</packaging>
+  <version>1.0.0</version>
+
+  <properties>
+    <openapi.generator.version>7.11.0</openapi.generator.version>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <!-- OkHttp -->
+    <dependency>
+      <groupId>com.squareup.okhttp3</groupId>
+      <artifactId>logging-interceptor</artifactId>
+      <version>4.11.0</version>
+    </dependency>
+
+    <!-- GsonFire -->
+    <dependency>
+      <groupId>io.gsonfire</groupId>
+      <artifactId>gson-fire</artifactId>
+      <version>1.8.5</version>
+    </dependency>
+
+    <!-- Required for OpenAPI Generated Code -->
+    <dependency>
+      <groupId>org.openapitools</groupId>
+      <artifactId>jackson-databind-nullable</artifactId>
+      <version>0.2.6</version>
+    </dependency>
+
+    <!-- Jakarta Annotations -->
+    <dependency>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
+      <version>2.1.1</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!-- OpenAPI Generator Plugin -->
+      <plugin>
+        <groupId>org.openapitools</groupId>
+        <artifactId>openapi-generator-maven-plugin</artifactId>
+        <version>${openapi.generator.version}</version>
+        <executions>
+          <execution>
+            <id>generate-sources</id>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+            <configuration>
+              <inputSpec>${project.basedir}/vlxtr-api-gateway.yaml</inputSpec>
+              <generatorName>java</generatorName>
+              <output>${project.build.directory}/generated-sources/openapi</output>
+              <apiPackage>com.p4r1nc3.vlxtr.gateway.api</apiPackage>
+              <modelPackage>com.p4r1nc3.vlxtr.gateway.model</modelPackage>
+              <templateDirectory>${project.basedir}/../custom-templates</templateDirectory>
+              <configOptions>
+                <library>okhttp-gson</library>
+                <dateLibrary>java8</dateLibrary>
+                <useJakartaEe>true</useJakartaEe>
+                <useOneOfDiscriminatorLookup>true</useOneOfDiscriminatorLookup>
+                <useOptional>true</useOptional>
+              </configOptions>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
