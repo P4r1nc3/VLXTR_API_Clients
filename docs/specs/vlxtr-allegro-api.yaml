@@ -1,0 +1,935 @@
+openapi: 3.0.3
+info:
+  title: VLXTR Allegro ServiceAPI v1
+  description: VLXTR Allegro API for managing Allegro account.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://54.93.165.149:9090
+    description: Production server
+  - url: http://localhost:9090
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Offers
+    description: Endpoints related to managing and retrieving Allegro offers.
+  - name: Tokens
+    description: Endpoints related to authentication tokens.
+  - name: System
+    description: System operations and health checks.
+
+paths:
+  /offers:
+    get:
+      tags:
+        - Offers
+      summary: Retrieve a list of offers from Allegro
+      description: Fetches offers available in Allegro based on the provided authorization token.
+      operationId: getOffers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved offers
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OffersListResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+
+  /offers/{offerId}:
+    get:
+      tags:
+        - Offers
+      summary: Retrieve a specific offer
+      description: Fetches a single offer based on the provided offer ID.
+      operationId: getOfferById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: offerId
+          in: path
+          required: true
+          description: The ID of the offer to retrieve
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved the offer
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OfferDetailsResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Offer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/register:
+    post:
+      tags:
+        - Tokens
+      summary: Register a new authentication token
+      description: Registers a new authentication token using the device code authorization flow.
+      operationId: registerToken
+      security: []
+      responses:
+        "200":
+          description: Successfully registered token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenRegister"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+
+  /tokens:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve stored access token
+      description: Returns the access token based on the Authorization header.
+      operationId: getToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/refresh:
+    post:
+      tags:
+        - Tokens
+      summary: Refresh authentication token
+      description: Uses the refresh token to obtain a new access token.
+      operationId: refreshToken
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token containing the device code.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully refreshed token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/{deviceCode}:
+    get:
+      tags:
+        - Tokens
+      summary: Retrieve stored access token (Deprecated)
+      description: Returns the access token for a given deviceCode if it is still valid. This endpoint is deprecated.
+      operationId: getTokenDeprecated
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceCode
+          in: path
+          required: true
+          description: The device code associated with the token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /tokens/{deviceCode}/refresh:
+    post:
+      tags:
+        - Tokens
+      summary: Refresh authentication token (Deprecated)
+      description: Uses the refresh token to obtain a new access token. This endpoint is deprecated.
+      operationId: refreshTokenDeprecated
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: deviceCode
+          in: path
+          required: true
+          description: The device code associated with the token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully refreshed token
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/TokenResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Token not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /test:
+    get:
+      tags:
+        - System
+      summary: Test endpoint
+      description: Simple test endpoint to verify API availability
+      operationId: test
+      security: []
+      responses:
+        "200":
+          description: Test successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test:
+                    type: string
+                    example: "ok"
+
+  /actuator/health:
+    get:
+      tags:
+        - System
+      summary: Check system health
+      description: Spring Boot Actuator health endpoint
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "UP"
+        "503":
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "DOWN"
+
+  /actuator/info:
+    get:
+      tags:
+        - System
+      summary: Application information
+      description: Spring Boot Actuator info endpoint
+      operationId: getInfo
+      security: []
+      responses:
+        "200":
+          description: Application information
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        cause:
+          type: string
+        action:
+          type: string
+        correlationId:
+          type: string
+          format: uuid
+
+    TokenRegister:
+      type: object
+      properties:
+        device_code:
+          type: string
+        expires_in:
+          type: integer
+        user_code:
+          type: string
+        interval:
+          type: integer
+        verification_uri:
+          type: string
+        verification_uri_complete:
+          type: string
+
+    TokenResponse:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresAt:
+          type: string
+          format: date-time
+
+    OffersListResponse:
+      type: object
+      description: Response from GET /offers, containing a list of simplified offers.
+      properties:
+        offers:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferListItem"
+        count:
+          type: integer
+          description: Number of offers returned in this response
+        totalCount:
+          type: integer
+          description: Total number of available offers
+
+    OfferListItem:
+      type: object
+      description: Single offer item in the list response.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        category:
+          $ref: "#/components/schemas/OfferCategory"
+        primaryImage:
+          $ref: "#/components/schemas/OfferImage"
+        sellingMode:
+          $ref: "#/components/schemas/OfferListSellingMode"
+        saleInfo:
+          $ref: "#/components/schemas/OfferListSaleInfo"
+        stats:
+          $ref: "#/components/schemas/OfferListStats"
+        stock:
+          $ref: "#/components/schemas/OfferListStock"
+        publication:
+          $ref: "#/components/schemas/OfferListPublication"
+        afterSalesServices:
+          $ref: "#/components/schemas/OfferAfterSalesServices"
+        additionalServices:
+          type: object
+          nullable: true
+        external:
+          type: object
+          nullable: true
+        delivery:
+          $ref: "#/components/schemas/OfferListDelivery"
+        b2b:
+          $ref: "#/components/schemas/OfferListB2B"
+        fundraisingCampaign:
+          type: object
+          nullable: true
+        additionalMarketplaces:
+          $ref: "#/components/schemas/OfferListAdditionalMarketplaces"
+
+    OfferCategory:
+      type: object
+      description: Category information for an offer.
+      properties:
+        id:
+          type: string
+
+    OfferImage:
+      type: object
+      description: Primary image information for an offer.
+      properties:
+        url:
+          type: string
+
+    OfferListSellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+          example: "BUY_NOW"
+        price:
+          $ref: "#/components/schemas/OfferPrice"
+        minimalPrice:
+          type: number
+          nullable: true
+        startingPrice:
+          type: number
+          nullable: true
+        priceAutomation:
+          type: object
+          nullable: true
+
+    OfferPrice:
+      type: object
+      properties:
+        amount:
+          type: string
+          example: "14.99"
+        currency:
+          type: string
+          example: "PLN"
+
+    OfferListSaleInfo:
+      type: object
+      properties:
+        currentPrice:
+          type: object
+          nullable: true
+          description: For auctions, if present, it contains the current highest bid price
+        biddersCount:
+          type: integer
+
+    OfferListStats:
+      type: object
+      properties:
+        watchersCount:
+          type: integer
+        visitsCount:
+          type: integer
+
+    OfferListStock:
+      type: object
+      properties:
+        available:
+          type: integer
+        sold:
+          type: integer
+
+    OfferListPublication:
+      type: object
+      description: Publication details in list response.
+      properties:
+        status:
+          type: string
+          example: "INACTIVE"
+        startingAt:
+          type: string
+          format: date-time
+          nullable: true
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+        endingAt:
+          type: string
+          format: date-time
+          nullable: true
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+        marketplaces:
+          $ref: "#/components/schemas/OfferListPublicationMarketplaces"
+
+    OfferListPublicationMarketplaces:
+      type: object
+      properties:
+        base:
+          type: object
+          properties:
+            id:
+              type: string
+        additional:
+          type: array
+          items:
+            type: object
+
+    OfferAfterSalesServices:
+      type: object
+      description: After sales services such as warranty or return policy.
+      properties:
+        warranty:
+          type: object
+          nullable: true
+        returnPolicy:
+          type: object
+          nullable: true
+        impliedWarranty:
+          type: object
+          nullable: true
+
+    OfferListDelivery:
+      type: object
+      properties:
+        shippingRates:
+          $ref: "#/components/schemas/OfferListShippingRates"
+
+    OfferListShippingRates:
+      type: object
+      properties:
+        id:
+          type: string
+
+    OfferListB2B:
+      type: object
+      properties:
+        buyableOnlyByBusiness:
+          type: boolean
+
+    OfferListAdditionalMarketplaces:
+      type: object
+      description: Additional marketplaces info in list response.
+
+    OfferDetailsResponse:
+      type: object
+      description: Response from GET /offers/{offerId}, containing detailed offer data.
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        productSet:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferProductSetItem"
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferParameter"
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        afterSalesServices:
+          $ref: "#/components/schemas/OfferAfterSalesServices"
+        payments:
+          $ref: "#/components/schemas/OfferPayments"
+        sellingMode:
+          $ref: "#/components/schemas/OfferDetailsSellingMode"
+        stock:
+          $ref: "#/components/schemas/OfferDetailsStock"
+        location:
+          $ref: "#/components/schemas/OfferLocation"
+        delivery:
+          $ref: "#/components/schemas/OfferDetailsDelivery"
+        description:
+          $ref: "#/components/schemas/OfferDescription"
+        external:
+          type: object
+          nullable: true
+        category:
+          $ref: "#/components/schemas/OfferCategory"
+        taxSettings:
+          type: object
+          nullable: true
+        sizeTable:
+          type: object
+          nullable: true
+        discounts:
+          type: object
+          properties:
+            wholesalePriceList:
+              type: object
+              nullable: true
+          nullable: true
+        contact:
+          type: object
+          nullable: true
+        fundraisingCampaign:
+          type: object
+          nullable: true
+        messageToSellerSettings:
+          type: object
+          nullable: true
+        attachments:
+          type: array
+          items:
+            type: object
+        b2b:
+          type: object
+          nullable: true
+        additionalServices:
+          type: object
+          nullable: true
+        compatibilityList:
+          type: object
+          nullable: true
+        additionalMarketplaces:
+          $ref: "#/components/schemas/OfferDetailsAdditionalMarketplaces"
+        warnings:
+          type: array
+          items:
+            type: object
+        language:
+          type: string
+        publication:
+          $ref: "#/components/schemas/OfferDetailsPublication"
+        validation:
+          $ref: "#/components/schemas/OfferValidation"
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    OfferProductSetItem:
+      type: object
+      properties:
+        product:
+          $ref: "#/components/schemas/OfferProduct"
+        quantity:
+          type: object
+          properties:
+            value:
+              type: integer
+        responsiblePerson:
+          type: object
+          nullable: true
+        responsibleProducer:
+          type: object
+          nullable: true
+        safetyInformation:
+          type: object
+          nullable: true
+        marketedBeforeGPSRObligation:
+          type: boolean
+
+    OfferProduct:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: true
+        publication:
+          type: object
+          properties:
+            status:
+              type: string
+              example: "NOT_LISTED"
+        parameters:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferParameter"
+
+    OfferParameter:
+      type: object
+      properties:
+        id:
+          type: string
+        name:
+          type: string
+        values:
+          type: array
+          items:
+            type: string
+        valuesIds:
+          type: array
+          items:
+            type: string
+          nullable: true
+        rangeValue:
+          type: object
+          nullable: true
+
+    OfferPayments:
+      type: object
+      properties:
+        invoice:
+          type: string
+          example: "NO_INVOICE"
+
+    OfferDetailsSellingMode:
+      type: object
+      properties:
+        format:
+          type: string
+        price:
+          $ref: "#/components/schemas/OfferPrice"
+        startingPrice:
+          type: number
+          nullable: true
+        minimalPrice:
+          type: number
+          nullable: true
+
+    OfferDetailsStock:
+      type: object
+      properties:
+        available:
+          type: integer
+        unit:
+          type: string
+          example: "UNIT"
+
+    OfferLocation:
+      type: object
+      properties:
+        countryCode:
+          type: string
+        province:
+          type: string
+        city:
+          type: string
+        postCode:
+          type: string
+
+    OfferDetailsDelivery:
+      type: object
+      properties:
+        shippingRates:
+          $ref: "#/components/schemas/OfferListShippingRates"
+        handlingTime:
+          type: string
+          description: ISO 8601 duration, e.g. "PT0S"
+        additionalInfo:
+          type: string
+          nullable: true
+        shipmentDate:
+          type: string
+          format: date-time
+          nullable: true
+
+    OfferDescription:
+      type: object
+      properties:
+        sections:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferDescriptionSection"
+
+    OfferDescriptionSection:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferDescriptionItem"
+
+    OfferDescriptionItem:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: [TEXT, IMAGE]
+        content:
+          type: string
+          nullable: true
+        url:
+          type: string
+          format: uri
+          nullable: true
+
+    OfferDetailsAdditionalMarketplaces:
+      type: object
+      description: Additional marketplaces info in details response.
+
+    OfferDetailsPublication:
+      type: object
+      properties:
+        status:
+          type: string
+          example: "INACTIVE"
+        duration:
+          type: string
+          format: duration
+          example: "PT720H"
+        endedBy:
+          type: string
+          nullable: true
+        endingAt:
+          type: string
+          format: date-time
+          nullable: true
+        startingAt:
+          type: string
+          format: date-time
+          nullable: true
+        republish:
+          type: boolean
+        marketplaces:
+          $ref: "#/components/schemas/OfferListPublicationMarketplaces"
+
+    OfferValidation:
+      type: object
+      properties:
+        errors:
+          type: array
+          items:
+            $ref: "#/components/schemas/OfferValidationMessage"
+        warnings:
+          type: array
+          items:
+            type: object
+        validatedAt:
+          type: string
+          format: date-time
+
+    OfferValidationMessage:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        details:
+          type: string
+        path:
+          type: string
+          nullable: true
+        userMessage:
+          type: string
+        metadata:
+          type: object
+          additionalProperties: true
+
+  examples:
+    UnauthorizedErrorResponse:
+      summary: An example of a 401 Unauthorized error
+      value:
+        status: 401
+        error: "Unauthorized"
+        cause: "Missing or invalid authentication token."
+        action: "Ensure you provide a valid JWT token in the Authorization header."
+        correlationId: "5fd99e5f-5483-4ba5-97cc-f1f756fcbe32"
+
+    NotFoundErrorResponse:
+      summary: An example of a 404 Not Found error
+      value:
+        status: 404
+        error: "Not Found"
+        cause: "The requested offer does not exist."
+        action: "Verify the Offer ID and try again."
+        correlationId: "d1608b4c-3baf-4be6-a637-76c833582575"

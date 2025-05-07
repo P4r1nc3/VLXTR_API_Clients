@@ -1,0 +1,300 @@
+openapi: 3.0.3
+info:
+  title: VLXTR Core Service API v1
+  description: VLXTR Core API for managing products, Google Drive integration, and Allegro offers.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://54.93.165.149:8081
+    description: Production server
+  - url: http://localhost:8081
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Products
+    description: Operations related to product management
+  - name: Google Drive
+    description: Operations related to Google Drive integration
+  - name: System
+    description: System operations and health checks
+
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Retrieve all products
+      description: Fetches all products from the database
+      operationId: getProducts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /products/{productId}:
+    get:
+      tags:
+        - Products
+      summary: Retrieve a specific product
+      description: Fetches a product by its Allegro offer ID
+      operationId: getProductByAllegroOfferId
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: productId
+          in: path
+          required: true
+          description: Allegro offer ID of the product
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved the product
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Product"
+        "404":
+          description: Product not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /products/populate:
+    get:
+      tags:
+        - Products
+      summary: Populate products from Allegro and Google Drive
+      description: Fetches offers from Allegro API, matches them with Google Drive files, and saves them as products
+      operationId: populateProducts
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully populated products
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Product"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /google/files:
+    get:
+      tags:
+        - Google Drive
+      summary: List Google Drive files
+      description: Fetches files from the configured Google Drive account
+      operationId: listFolderContents
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Successfully retrieved Google Drive files
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/GoogleDriveFile"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /test:
+    get:
+      tags:
+        - System
+      summary: Test endpoint
+      description: Simple test endpoint to verify API availability
+      operationId: test
+      security: []
+      responses:
+        "200":
+          description: Test successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test:
+                    type: string
+                    example: "ok"
+
+  /actuator/health:
+    get:
+      tags:
+        - System
+      summary: Check system health
+      description: Spring Boot Actuator health endpoint
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "UP"
+        "503":
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "DOWN"
+
+  /actuator/info:
+    get:
+      tags:
+        - System
+      summary: Application information
+      description: Spring Boot Actuator info endpoint
+      operationId: getInfo
+      security: []
+      responses:
+        "200":
+          description: Application information
+          content:
+            application/json:
+              schema:
+                type: object
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    Product:
+      type: object
+      properties:
+        productId:
+          type: string
+          description: Unique product model ID
+          example: "VLX-2023-BLACK"
+        productName:
+          type: string
+          description: Product name from Allegro
+          example: "Smartwatch VLX 2023 Series Black Edition"
+        productColour:
+          type: string
+          description: Product color extracted from model ID
+          example: "BLACK"
+        productPrice:
+          type: number
+          format: double
+          description: Product price from Allegro
+          example: 199.99
+        allegroOfferId:
+          type: string
+          description: Allegro offer ID
+          example: "12345678901"
+        allegroOfferLink:
+          type: string
+          format: uri
+          description: Link to Allegro offer page
+          example: "https://allegro.pl/oferta/12345678901"
+        googleDriveId:
+          type: string
+          description: Google Drive file ID for product documentation
+          example: "1AbCdEfGhIjKlMnOpQrStUvWxYz"
+        googleDriveLink:
+          type: string
+          format: uri
+          description: Link to Google Drive file
+          example: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view"
+        isValid:
+          type: boolean
+          description: Flag indicating if product is valid
+          example: true
+
+    GoogleDriveFile:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Google Drive file ID
+          example: "1AbCdEfGhIjKlMnOpQrStUvWxYz"
+        name:
+          type: string
+          description: File name
+          example: "VLX-2023-BLACK.pdf"
+        mimeType:
+          type: string
+          description: File MIME type
+          example: "application/pdf"
+        webViewLink:
+          type: string
+          format: uri
+          description: Link to view file in browser
+          example: "https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQrStUvWxYz/view"
+
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+          description: HTTP status code
+          example: 404
+        error:
+          type: string
+          description: Error type
+          example: "Not Found"
+        cause:
+          type: string
+          description: Cause of the error
+          example: "Product with allegroOfferId: 12345678901 not found"
+        action:
+          type: string
+          description: Suggested action to resolve the error
+          example: "Verify the Allegro Offer ID and try again."
+        correlationId:
+          type: string
+          format: uuid
+          description: Unique ID for tracking the error
+          example: "5fd99e5f-5483-4ba5-97cc-f1f756fcbe32"

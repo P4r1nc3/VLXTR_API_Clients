@@ -1,0 +1,29 @@
+name: Deploy Swagger to GitHub Pages
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Create specs directory
+        run: mkdir -p docs/specs
+
+      - name: Copy YAML files to docs/specs
+        run: |
+          cp vlxtr-allegro-api/vlxtr-allegro-api.yaml docs/specs/
+          cp vlxtr-api-gateway/vlxtr-api-gateway.yaml docs/specs/
+          cp vlxtr-bambu-api/vlxtr-bambu-api.yaml docs/specs/
+          cp vlxtr-core-api/vlxtr-core-api.yaml docs/specs/
+
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: docs
+          branch: gh-pages

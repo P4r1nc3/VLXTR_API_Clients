@@ -1,0 +1,338 @@
+openapi: 3.0.3
+info:
+  title: VLXTR Bambu Service API v1
+  description: VLXTR Bambu API for managing Bambu Lab printers.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: http://localhost:8000
+    description: Local development server
+
+security:
+  - bearerAuth: []
+
+tags:
+  - name: Printers
+    description: Endpoints related to managing and retrieving Bambu Lab printers.
+
+paths:
+  /printers:
+    post:
+      tags:
+        - Printers
+      summary: Add Printer
+      description: Registers a new Bambu Lab printer in the system.
+      operationId: addPrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrinterCreate"
+        required: true
+      responses:
+        "200":
+          description: Printer successfully registered.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Printer"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+
+    get:
+      tags:
+        - Printers
+      summary: Get All Printers
+      description: Retrieves a list of all registered Bambu Lab printers.
+      operationId: getPrinters
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successful response with a list of printers.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Printer"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+
+  /printers/{serial}:
+    get:
+      tags:
+        - Printers
+      summary: Get Printer
+      description: Retrieves details of a specific Bambu Lab printer based on its serial number.
+      operationId: getPrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved printer details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Printer"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Offer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+    put:
+      tags:
+        - Printers
+      summary: Update Printer
+      description: Updates the details of a specific printer using its serial number.
+      operationId: updatePrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PrinterUpdate"
+      responses:
+        "200":
+          description: Printer successfully updated.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Printer"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Offer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+    delete:
+      tags:
+        - Printers
+      summary: Delete Printer
+      description: Removes a printer from the system using its serial number.
+      operationId: deletePrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer to be deleted.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Printer successfully deleted.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                unauthorizedExample:
+                  $ref: "#/components/examples/UnauthorizedErrorResponse"
+        "404":
+          description: Offer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              examples:
+                notFoundExample:
+                  $ref: "#/components/examples/NotFoundErrorResponse"
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        status:
+          type: integer
+        error:
+          type: string
+        cause:
+          type: string
+        action:
+          type: string
+        correlationId:
+          type: string
+          format: uuid
+
+    Printer:
+      type: object
+      description: Represents a Bambu Lab printer in the system.
+      properties:
+        ip:
+          type: string
+          description: IP address of the printer.
+          example: 192.168.33.6
+        serial:
+          type: string
+          description: Unique serial number of the printer.
+          example: 0309DA470101168
+        access_code:
+          type: string
+          description: Security access code required to authenticate the printer.
+          example: "27417158"
+      required:
+        - ip
+        - serial
+        - access_code
+
+    PrinterCreate:
+      type: object
+      description: Schema for creating a new printer entry.
+      properties:
+        ip:
+          type: string
+          description: IP address of the new printer.
+          example: 192.168.33.7
+        serial:
+          type: string
+          description: Unique serial number of the new printer.
+          example: 0409DA470101169
+        access_code:
+          type: string
+          description: Security access code for the new printer.
+          example: "12345678"
+      required:
+        - ip
+        - serial
+        - access_code
+
+    PrinterUpdate:
+      type: object
+      description: Schema for updating printer details.
+      properties:
+        ip:
+          type: string
+          description: Updated IP address of the printer (optional).
+          example: 192.168.33.8
+        serial:
+          type: string
+          description: Updated serial number of the printer (optional).
+          example: 0509DA470101170
+        access_code:
+          type: string
+          description: Updated security access code of the printer (optional).
+          example: "87654321"
+
+  examples:
+    UnauthorizedErrorResponse:
+      summary: An example of a 401 Unauthorized error
+      value:
+        status: 401
+        error: "Unauthorized"
+        cause: "Missing or invalid authentication token."
+        action: "Ensure you provide a valid JWT token in the Authorization header."
+        correlationId: "5fd99e5f-5483-4ba5-97cc-f1f756fcbe32"
+
+    NotFoundErrorResponse:
+      summary: An example of a 404 Not Found error
+      value:
+        status: 404
+        error: "Not Found"
+        cause: "The requested printer does not exist."
+        action: "Verify printer serial number and try again."
+        correlationId: "d1608b4c-3baf-4be6-a637-76c833582575"
