@@ -1,19 +1,39 @@
-<!-- HTML for static distribution bundle build -->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <title>Swagger UI</title>
-    <link rel="stylesheet" type="text/css" href="swagger/swagger-ui.css" />
-    <link rel="stylesheet" type="text/css" href="swagger/index.css" />
-    <link rel="icon" type="image/png" href="swagger/favicon-32x32.png" sizes="32x32" />
-    <link rel="icon" type="image/png" href="swagger/favicon-16x16.png" sizes="16x16" />
-  </head>
+<head>
+  <meta charset="UTF-8">
+  <title>VLXTR API Documentation</title>
+  <link rel="stylesheet" type="text/css" href="swagger/swagger-ui.css" />
+  <link rel="stylesheet" type="text/css" href="swagger/index.css" />
+  <link rel="icon" type="image/png" href="swagger/favicon-32x32.png" sizes="32x32" />
+  <link rel="icon" type="image/png" href="swagger/favicon-16x16.png" sizes="16x16" />
+  <style>
+    .api-selector {
+      background-color: #1b1b1b;
+      padding: 10px;
+      color: white;
+    }
+    .api-selector select {
+      padding: 5px;
+      margin-left: 10px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
 
-  <body>
-    <div id="swagger-ui"></div>
-    <script src="swagger/swagger-ui-bundle.js" charset="UTF-8"> </script>
-    <script src="swagger/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
-    <script src="swagger/swagger-initializer.js" charset="UTF-8"> </script>
-  </body>
+<body>
+<div class="api-selector">
+  <label for="api-select">Select API:</label>
+  <select id="api-select">
+    <option value="vlxtr-allegro-api/vlxtr-allegro-api.yaml">VLXTR Allegro API</option>
+    <option value="vlxtr-api-gateway/vlxtr-api-gateway.yaml">VLXTR API Gateway</option>
+    <option value="vlxtr-bambu-api/vlxtr-bambu-api.yaml">VLXTR Bambu API</option>
+    <option value="vlxtr-core-api/vlxtr-core-api.yaml">VLXTR Core API</option>
+  </select>
+</div>
+<div id="swagger-ui"></div>
+<script src="swagger/swagger-ui-bundle.js" charset="UTF-8"> </script>
+<script src="swagger/swagger-ui-standalone-preset.js" charset="UTF-8"> </script>
+<script src="swagger/swagger-initializer.js" charset="UTF-8"> </script>
+</body>
 </html>
