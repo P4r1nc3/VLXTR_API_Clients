@@ -1,36 +1,28 @@
 window.onload = function() {
-  // Get the select element
-  const apiSelect = document.getElementById('api-select');
+  //<editor-fold desc="Changeable Configuration Block">
 
-  // Function to initialize Swagger UI with the selected API
-  function initSwaggerUI(url) {
-    // Clear previous UI instance if it exists
-    const swaggerUIContainer = document.getElementById('swagger-ui');
-    while (swaggerUIContainer.firstChild) {
-      swaggerUIContainer.removeChild(swaggerUIContainer.firstChild);
-    }
-
-    // Initialize new UI with selected API
-    window.ui = SwaggerUIBundle({
-      url: url,
-      dom_id: '#swagger-ui',
-      deepLinking: true,
-      presets: [
-        SwaggerUIBundle.presets.apis,
-        SwaggerUIStandalonePreset
-      ],
-      plugins: [
-        SwaggerUIBundle.plugins.DownloadUrl
-      ],
-      layout: "StandaloneLayout"
-    });
-  }
-
-  // Initialize with the default selection
-  initSwaggerUI(apiSelect.value);
-
-  // Add change event listener to the select element
-  apiSelect.addEventListener('change', function() {
-    initSwaggerUI(this.value);
+  // the following lines will be replaced by docker/configurator, when it runs in a docker-container
+  window.ui = SwaggerUIBundle({
+    urls: [
+      {url: "vlxtr-allegro-api/vlxtr-allegro-api.yaml", name: "VLXTR Allegro API"},
+      {url: "vlxtr-api-gateway/vlxtr-api-gateway.yaml", name: "VLXTR API Gateway"},
+      {url: "vlxtr-bambu-api/vlxtr-bambu-api.yaml", name: "VLXTR Bambu API"},
+      {url: "vlxtr-core-api/vlxtr-core-api.yaml", name: "VLXTR Core API"}
+    ],
+    dom_id: '#swagger-ui',
+    deepLinking: true,
+    presets: [
+      SwaggerUIBundle.presets.apis,
+      SwaggerUIStandalonePreset
+    ],
+    plugins: [
+      SwaggerUIBundle.plugins.DownloadUrl
+    ],
+    layout: "StandaloneLayout",
+    displayOperationId: true,
+    filter: true,
+    withCredentials: true
   });
+
+  //</editor-fold>
 };
