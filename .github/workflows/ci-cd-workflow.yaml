@@ -70,58 +70,34 @@ jobs:
       - name: Check YAML formatting
         run: prettier --check "**/*.yaml"
 
-  check-all-changes:
-    name: Check All API Changes
+  check-allegro-changes:
+    name: Check Allegro API Changes
     runs-on: ubuntu-latest
     needs: format-check
     if: github.event_name == 'push' && success()
     outputs:
-      allegro_changed: ${{ steps.detect_changes.outputs.allegro_changed }}
-      bambu_changed: ${{ steps.detect_changes.outputs.bambu_changed }}
-      gateway_changed: ${{ steps.detect_changes.outputs.gateway_changed }}
-      core_changed: ${{ steps.detect_changes.outputs.core_changed }}
+      changed: ${{ steps.detect_changes.outputs.allegro_changed }}
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
-      - name: Detect changes in APIs
+      - name: Detect changes in Allegro API
         id: detect_changes
         run: |
           allegro_changed="false"
           if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-allegro-api.yaml'; then
             allegro_changed="true"
           fi
-          echo "allegro_changed=$allegro_changed" >> $GITHUB_OUTPUT
+          echo "allegro_changed=$allegro_changed" >> $GITHUB_ENV
+          echo "::set-output name=allegro_changed::$allegro_changed"
 
-          bambu_changed="false"
-          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-bambu-api.yaml'; then
-            bambu_changed="true"
-          fi
-          echo "bambu_changed=$bambu_changed" >> $GITHUB_OUTPUT
-
-          gateway_changed="false"
-          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-api-gateway.yaml'; then
-            gateway_changed="true"
-          fi
-          echo "gateway_changed=$gateway_changed" >> $GITHUB_OUTPUT
-
-          core_changed="false"
-          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-core-api.yaml'; then
-            core_changed="true"
-          fi
-          echo "core_changed=$core_changed" >> $GITHUB_OUTPUT
-
-  deploy-apis:
-    name: Deploy Changed APIs
+  deploy-allegro:
+    name: Deploy Allegro API
     runs-on: ubuntu-latest
-    needs: check-all-changes
-    if: |
-      needs.check-all-changes.outputs.allegro_changed == 'true' || 
-      needs.check-all-changes.outputs.bambu_changed == 'true' || 
-      needs.check-all-changes.outputs.gateway_changed == 'true' || 
-      needs.check-all-changes.outputs.core_changed == 'true'
+    needs: check-allegro-changes
+    if: needs.check-allegro-changes.outputs.changed == 'true' && success()
     permissions:
       contents: write
       packages: write
@@ -131,7 +107,6 @@ jobs:
         uses: actions/checkout@v3
         with:
           fetch-depth: 0
-          token: ${{ github.token }}
 
       - name: Set up Java and Maven
         uses: actions/setup-java@v3
@@ -154,73 +129,351 @@ jobs:
             </servers>
           </settings>" > ~/.m2/settings.xml
 
-      - name: Update versions and deploy changed APIs
+      - name: Increment version for Allegro API
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Apply versioning logic
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
         run: |
           git config --global user.name "github-actions"
           git config --global user.email "github-actions@github.com"
 
-          git pull origin master
+          git fetch origin master
+          git checkout master
 
-          increment_version() {
-            local current_version=$1
-            IFS='.' read -r major minor patch <<< "$current_version"
+          git stash
+          git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
 
-            if [ "$patch" -eq 9 ]; then
-              if [ "$minor" -eq 9 ]; then
-                major=$((major + 1))
-                minor=0
-              else
-                minor=$((minor + 1))
-              fi
-              patch=0
-            else
-              patch=$((patch + 1))
-            fi
-
-            echo "$major.$minor.$patch"
-          }
-
-          CHANGED_MODULES=""
-          COMMIT_MESSAGE="Update API versions:"
-
-          if [[ "${{ needs.check-all-changes.outputs.allegro_changed }}" == "true" ]]; then
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
-            NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-            mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
-            CHANGED_MODULES="$CHANGED_MODULES vlxtr-allegro-api"
-            COMMIT_MESSAGE="$COMMIT_MESSAGE allegro=$NEW_VERSION"
-          fi
-
-          if [[ "${{ needs.check-all-changes.outputs.bambu_changed }}" == "true" ]]; then
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-bambu-api -q -DforceStdout)
-            NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-            mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-bambu-api
-            CHANGED_MODULES="$CHANGED_MODULES vlxtr-bambu-api"
-            COMMIT_MESSAGE="$COMMIT_MESSAGE bambu=$NEW_VERSION"
-          fi
-
-          if [[ "${{ needs.check-all-changes.outputs.gateway_changed }}" == "true" ]]; then
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-api-gateway -q -DforceStdout)
-            NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-            mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-api-gateway
-            CHANGED_MODULES="$CHANGED_MODULES vlxtr-api-gateway"
-            COMMIT_MESSAGE="$COMMIT_MESSAGE gateway=$NEW_VERSION"
-          fi
-
-          if [[ "${{ needs.check-all-changes.outputs.core_changed }}" == "true" ]]; then
-            CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-core-api -q -DforceStdout)
-            NEW_VERSION=$(increment_version "$CURRENT_VERSION")
-            mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-core-api
-            CHANGED_MODULES="$CHANGED_MODULES vlxtr-core-api"
-            COMMIT_MESSAGE="$COMMIT_MESSAGE core=$NEW_VERSION"
-          fi
-
-          git add */pom.xml
-          git commit -m "$COMMIT_MESSAGE"
+          git add vlxtr-allegro-api/pom.xml
+          git commit -m "Bump Allegro API client version to $NEW_VERSION"
           git push origin master
 
-          if [[ ! -z "$CHANGED_MODULES" ]]; then
-            mvn clean deploy -pl "$CHANGED_MODULES" -DskipTests
+      - name: Deploy Allegro API
+        run: mvn clean deploy -pl vlxtr-allegro-api
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  check-bambu-changes:
+    name: Check Bambu API Changes
+    runs-on: ubuntu-latest
+    needs: format-check
+    if: github.event_name == 'push' && success()
+    outputs:
+      changed: ${{ steps.detect_changes.outputs.bambu_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in Bambu API
+        id: detect_changes
+        run: |
+          bambu_changed="false"
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-bambu-api.yaml'; then
+            bambu_changed="true"
           fi
+          echo "bambu_changed=$bambu_changed" >> $GITHUB_ENV
+          echo "::set-output name=bambu_changed::$bambu_changed"
+
+  deploy-bambu:
+    name: Deploy Bambu API
+    runs-on: ubuntu-latest
+    needs: check-bambu-changes
+    if: needs.check-bambu-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ github.token }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Increment version for Bambu API
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-bambu-api -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Apply versioning logic
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-bambu-api
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git fetch origin master
+          git checkout master
+
+          git stash
+          git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
+
+          git add vlxtr-bambu-api/pom.xml
+          git commit -m "Bump Bambu API client version to $NEW_VERSION"
+          git push origin master
+
+      - name: Deploy Bambu API
+        run: mvn clean deploy -pl vlxtr-bambu-api
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  check-gateway-changes:
+    name: Check API Gateway Changes
+    runs-on: ubuntu-latest
+    needs: format-check
+    if: github.event_name == 'push' && success()
+    outputs:
+      changed: ${{ steps.detect_changes.outputs.gateway_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in API Gateway
+        id: detect_changes
+        run: |
+          gateway_changed="false"
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-api-gateway.yaml'; then
+            gateway_changed="true"
+          fi
+          echo "gateway_changed=$gateway_changed" >> $GITHUB_ENV
+          echo "::set-output name=gateway_changed::$gateway_changed"
+
+  deploy-gateway:
+    name: Deploy API Gateway
+    runs-on: ubuntu-latest
+    needs: check-gateway-changes
+    if: needs.check-gateway-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ github.token }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Increment version for API Gateway
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-api-gateway -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Apply versioning logic
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-api-gateway
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git fetch origin master
+          git checkout master
+
+          git stash
+          git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
+
+          git add vlxtr-api-gateway/pom.xml
+          git commit -m "Bump API Gateway version to $NEW_VERSION"
+          git push origin master
+
+      - name: Deploy API Gateway
+        run: mvn clean deploy -pl vlxtr-api-gateway
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
+  check-core-changes:
+    name: Check Core API Changes
+    runs-on: ubuntu-latest
+    needs: format-check
+    if: github.event_name == 'push' && success()
+    outputs:
+      changed: ${{ steps.detect_changes.outputs.core_changed }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect changes in Core API
+        id: detect_changes
+        run: |
+          core_changed="false"
+          if git diff --name-only HEAD^ HEAD | grep -q 'vlxtr-core-api.yaml'; then
+            core_changed="true"
+          fi
+          echo "core_changed=$core_changed" >> $GITHUB_ENV
+          echo "::set-output name=core_changed::$core_changed"
+
+  deploy-core:
+    name: Deploy Core API
+    runs-on: ubuntu-latest
+    needs: check-core-changes
+    if: needs.check-core-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java and Maven
+        uses: actions/setup-java@v3
+        with:
+          distribution: "temurin"
+          java-version: "17"
+          server-id: github
+          settings-path: ${{ github.workspace }}
+
+      - name: Configure GitHub Packages Authentication
+        run: |
+          mkdir -p ~/.m2
+          echo "<settings>
+            <servers>
+              <server>
+                <id>github</id>
+                <username>${{ github.actor }}</username>
+                <password>${{ github.token }}</password>
+              </server>
+            </servers>
+          </settings>" > ~/.m2/settings.xml
+
+      - name: Increment version for Core API
+        run: |
+          CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-core-api -q -DforceStdout)
+          IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
+
+          # Apply versioning logic
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
+          mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-core-api
+          echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Commit updated version
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+          git fetch origin master
+          git checkout master
+
+          git stash
+          git pull --rebase origin master
+          git stash pop || echo "No changes to apply"
+
+          git add vlxtr-core-api/pom.xml
+          git commit -m "Bump Core API version to $NEW_VERSION"
+          git push origin master
+
+      - name: Deploy Core API
+        run: mvn clean deploy -pl vlxtr-core-api
         env:
           GITHUB_TOKEN: ${{ github.token }}
