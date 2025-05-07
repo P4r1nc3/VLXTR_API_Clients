@@ -14,7 +14,7 @@
   <groupId>com.p4r1nc3.vlxtr</groupId>
   <artifactId>vlxtr-allegro-api</artifactId>
   <packaging>jar</packaging>
-  <version>1.2.7</version>
+  <version>1.2.8</version>
 
   <properties>
     <openapi.generator.version>7.11.0</openapi.generator.version>
