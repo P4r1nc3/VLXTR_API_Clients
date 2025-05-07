@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Vlxtr Core Service API
-  description: Vlxtr Core Service API for managing products, Google Drive integration, and Allegro offers.
+  title: VLXTR Core Service API
+  description: VLXTR Core Service API for managing products, Google Drive integration, and Allegro offers.
   version: 1.0.0
   license:
     name: MIT

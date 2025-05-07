@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
-  title: Vlxtr API Gateway
-  description: API Gateway for Vlxtr services, handling authentication, authorization, and request routing.
+  title: VLXTR API Gateway
+  description: API Gateway for VLXTR services, handling authentication, authorization, and request routing.
   version: 1.0.0
   license:
     name: MIT

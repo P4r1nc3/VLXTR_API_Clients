@@ -12,6 +12,9 @@ jobs:
   build:
     name: Build All Modules
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -95,6 +98,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-allegro-changes
     if: needs.check-allegro-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -118,7 +124,7 @@ jobs:
               <server>
                 <id>github</id>
                 <username>${{ github.actor }}</username>
-                <password>${{ secrets.TOKEN_GITHUB }}</password>
+                <password>${{ github.token }}</password>
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
@@ -128,6 +134,7 @@ jobs:
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
 
+          # Apply versioning logic
           if [ "$patch" -eq 9 ]; then
             if [ "$minor" -eq 9 ]; then
               major=$((major + 1))
@@ -163,7 +170,7 @@ jobs:
       - name: Deploy Allegro API
         run: mvn clean deploy -pl vlxtr-allegro-api
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   check-bambu-changes:
     name: Check Bambu API Changes
@@ -193,6 +200,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-bambu-changes
     if: needs.check-bambu-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -216,7 +226,7 @@ jobs:
               <server>
                 <id>github</id>
                 <username>${{ github.actor }}</username>
-                <password>${{ secrets.TOKEN_GITHUB }}</password>
+                <password>${{ github.token }}</password>
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
@@ -226,6 +236,7 @@ jobs:
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-bambu-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
 
+          # Apply versioning logic
           if [ "$patch" -eq 9 ]; then
             if [ "$minor" -eq 9 ]; then
               major=$((major + 1))
@@ -261,7 +272,7 @@ jobs:
       - name: Deploy Bambu API
         run: mvn clean deploy -pl vlxtr-bambu-api
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   check-gateway-changes:
     name: Check API Gateway Changes
@@ -291,6 +302,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-gateway-changes
     if: needs.check-gateway-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -314,7 +328,7 @@ jobs:
               <server>
                 <id>github</id>
                 <username>${{ github.actor }}</username>
-                <password>${{ secrets.TOKEN_GITHUB }}</password>
+                <password>${{ github.token }}</password>
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
@@ -324,6 +338,7 @@ jobs:
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-api-gateway -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
 
+          # Apply versioning logic
           if [ "$patch" -eq 9 ]; then
             if [ "$minor" -eq 9 ]; then
               major=$((major + 1))
@@ -359,7 +374,7 @@ jobs:
       - name: Deploy API Gateway
         run: mvn clean deploy -pl vlxtr-api-gateway
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ github.token }}
 
   check-core-changes:
     name: Check Core API Changes
@@ -389,6 +404,9 @@ jobs:
     runs-on: ubuntu-latest
     needs: check-core-changes
     if: needs.check-core-changes.outputs.changed == 'true' && success()
+    permissions:
+      contents: write
+      packages: write
 
     steps:
       - name: Checkout repository
@@ -412,7 +430,7 @@ jobs:
               <server>
                 <id>github</id>
                 <username>${{ github.actor }}</username>
-                <password>${{ secrets.TOKEN_GITHUB }}</password>
+                <password>${{ github.token }}</password>
               </server>
             </servers>
           </settings>" > ~/.m2/settings.xml
@@ -422,6 +440,7 @@ jobs:
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-core-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
 
+          # Apply versioning logic
           if [ "$patch" -eq 9 ]; then
             if [ "$minor" -eq 9 ]; then
               major=$((major + 1))
@@ -457,4 +476,4 @@ jobs:
       - name: Deploy Core API
         run: mvn clean deploy -pl vlxtr-core-api
         env:
-          GITHUB_TOKEN: ${{ secrets.TOKEN_GITHUB }}
+          GITHUB_TOKEN: ${{ github.token }}
