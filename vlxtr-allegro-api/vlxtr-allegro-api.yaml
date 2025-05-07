@@ -223,7 +223,7 @@ paths:
       description: Returns the access token for a given deviceCode if it is still valid. This endpoint is deprecated.
       operationId: getTokenDeprecated
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: deviceCode
           in: path
@@ -265,7 +265,7 @@ paths:
       description: Uses the refresh token to obtain a new access token. This endpoint is deprecated.
       operationId: refreshTokenDeprecated
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: deviceCode
           in: path
