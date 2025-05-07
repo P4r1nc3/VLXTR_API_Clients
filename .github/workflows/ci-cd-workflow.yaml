@@ -127,7 +127,20 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-allegro-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_VERSION="$major.$minor.$((patch + 1))"
+
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-allegro-api
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
@@ -212,7 +225,20 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-bambu-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_VERSION="$major.$minor.$((patch + 1))"
+
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-bambu-api
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
@@ -297,7 +323,20 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-api-gateway -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_VERSION="$major.$minor.$((patch + 1))"
+
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-api-gateway
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
@@ -382,7 +421,20 @@ jobs:
         run: |
           CURRENT_VERSION=$(mvn help:evaluate -Dexpression=project.version -pl vlxtr-core-api -q -DforceStdout)
           IFS='.' read -r major minor patch <<< "$CURRENT_VERSION"
-          NEW_VERSION="$major.$minor.$((patch + 1))"
+
+          if [ "$patch" -eq 9 ]; then
+            if [ "$minor" -eq 9 ]; then
+              major=$((major + 1))
+              minor=0
+            else
+              minor=$((minor + 1))
+            fi
+            patch=0
+          else
+            patch=$((patch + 1))
+          fi
+
+          NEW_VERSION="$major.$minor.$patch"
           mvn versions:set -DnewVersion=$NEW_VERSION -DgenerateBackupPoms=false -pl vlxtr-core-api
           echo "NEW_VERSION=$NEW_VERSION" >> $GITHUB_ENV
 
