@@ -33,7 +33,7 @@ paths:
       description: Fetches all products from the database
       operationId: getProducts
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved products
@@ -58,7 +58,7 @@ paths:
       description: Fetches a product by its Allegro offer ID
       operationId: getProductByAllegroOfferId
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       parameters:
         - name: productId
           in: path
@@ -94,7 +94,7 @@ paths:
       description: Fetches offers from Allegro API, matches them with Google Drive files, and saves them as products
       operationId: populateProducts
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully populated products
@@ -119,7 +119,7 @@ paths:
       description: Fetches files from the configured Google Drive account
       operationId: listFolderContents
       security:
-        - bearerAuth: [ ]
+        - bearerAuth: []
       responses:
         "200":
           description: Successfully retrieved Google Drive files
@@ -203,6 +203,12 @@ paths:
                 type: object
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
   schemas:
     Product:
       type: object
