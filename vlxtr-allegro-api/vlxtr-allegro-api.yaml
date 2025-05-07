@@ -8,6 +8,8 @@ info:
     url: https://opensource.org/licenses/MIT
 
 servers:
+  - url: http://54.93.165.149:9090
+    description: Production server
   - url: http://localhost:9090
     description: Local development server
 
@@ -19,6 +21,8 @@ tags:
     description: Endpoints related to managing and retrieving Allegro offers.
   - name: Tokens
     description: Endpoints related to authentication tokens.
+  - name: System
+    description: System operations and health checks.
 
 paths:
   /offers:
@@ -218,6 +222,8 @@ paths:
       summary: Retrieve stored access token (Deprecated)
       description: Returns the access token for a given deviceCode if it is still valid. This endpoint is deprecated.
       operationId: getTokenDeprecated
+      security:
+        - bearerAuth: []
       parameters:
         - name: deviceCode
           in: path
@@ -258,6 +264,8 @@ paths:
       summary: Refresh authentication token (Deprecated)
       description: Uses the refresh token to obtain a new access token. This endpoint is deprecated.
       operationId: refreshTokenDeprecated
+      security:
+        - bearerAuth: []
       parameters:
         - name: deviceCode
           in: path
@@ -290,6 +298,72 @@ paths:
               examples:
                 notFoundExample:
                   $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /test:
+    get:
+      tags:
+        - System
+      summary: Test endpoint
+      description: Simple test endpoint to verify API availability
+      operationId: test
+      security: []
+      responses:
+        "200":
+          description: Test successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  test:
+                    type: string
+                    example: "ok"
+
+  /actuator/health:
+    get:
+      tags:
+        - System
+      summary: Check system health
+      description: Spring Boot Actuator health endpoint
+      operationId: getHealth
+      security: []
+      responses:
+        "200":
+          description: System is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "UP"
+        "503":
+          description: System is unhealthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "DOWN"
+
+  /actuator/info:
+    get:
+      tags:
+        - System
+      summary: Application information
+      description: Spring Boot Actuator info endpoint
+      operationId: getInfo
+      security: []
+      responses:
+        "200":
+          description: Application information
+          content:
+            application/json:
+              schema:
+                type: object
 
 components:
   securitySchemes:
