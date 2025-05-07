@@ -222,6 +222,8 @@ paths:
       summary: Retrieve stored access token (Deprecated)
       description: Returns the access token for a given deviceCode if it is still valid. This endpoint is deprecated.
       operationId: getTokenDeprecated
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: deviceCode
           in: path
@@ -262,6 +264,8 @@ paths:
       summary: Refresh authentication token (Deprecated)
       description: Uses the refresh token to obtain a new access token. This endpoint is deprecated.
       operationId: refreshTokenDeprecated
+      security:
+        - bearerAuth: [ ]
       parameters:
         - name: deviceCode
           in: path
@@ -302,6 +306,7 @@ paths:
       summary: Test endpoint
       description: Simple test endpoint to verify API availability
       operationId: test
+      security: []
       responses:
         "200":
           description: Test successful
@@ -321,6 +326,7 @@ paths:
       summary: Check system health
       description: Spring Boot Actuator health endpoint
       operationId: getHealth
+      security: []
       responses:
         "200":
           description: System is healthy
@@ -350,6 +356,7 @@ paths:
       summary: Application information
       description: Spring Boot Actuator info endpoint
       operationId: getInfo
+      security: []
       responses:
         "200":
           description: Application information

@@ -13,6 +13,9 @@ servers:
   - url: http://localhost:8080
     description: Local development server
 
+security:
+  - bearerAuth: []
+
 tags:
   - name: Authentication
     description: Operations related to authentication and user management
@@ -27,6 +30,7 @@ paths:
       summary: User login
       description: Authenticates a user and returns an access token
       operationId: login
+      security: []
       requestBody:
         required: true
         content:
@@ -60,6 +64,7 @@ paths:
       summary: User registration
       description: Registers a new user in Keycloak and returns activation URL
       operationId: register
+      security: []
       requestBody:
         required: true
         content:
@@ -98,6 +103,7 @@ paths:
       summary: Test endpoint
       description: Simple test endpoint to verify API gateway availability
       operationId: test
+      security: []
       responses:
         "200":
           description: Test successful
@@ -117,6 +123,7 @@ paths:
       summary: Check system health
       description: Spring Boot Actuator health endpoint
       operationId: getHealth
+      security: []
       responses:
         "200":
           description: System is healthy
@@ -146,6 +153,7 @@ paths:
       summary: Application information
       description: Spring Boot Actuator info endpoint
       operationId: getInfo
+      security: []
       responses:
         "200":
           description: Application information
@@ -258,6 +266,3 @@ components:
           format: date-time
           description: Time when the error occurred
           example: "2025-05-07T12:34:56.789Z"
-
-security:
-  - bearerAuth: []
