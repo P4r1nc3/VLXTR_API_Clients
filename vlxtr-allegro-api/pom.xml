@@ -20,6 +20,7 @@
     <openapi.generator.version>7.11.0</openapi.generator.version>
     <maven.compiler.source>17</maven.compiler.source>
     <maven.compiler.target>17</maven.compiler.target>
+    <junit.version>5.10.2</junit.version>
   </properties>
 
   <dependencies>
@@ -50,6 +51,26 @@
       <artifactId>jakarta.annotation-api</artifactId>
       <version>2.1.1</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.p4r1nc3.vlxtr</groupId>
+      <artifactId>vlxtr-openapi-generator</artifactId>
+      <version>1.0.0</version>
+    </dependency>
+
+    <!-- JUnit dependencies for tests -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -59,6 +80,14 @@
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>${openapi.generator.version}</version>
+        <!-- Add the dependencies to include your custom generator -->
+        <dependencies>
+          <dependency>
+            <groupId>com.p4r1nc3.vlxtr</groupId>
+            <artifactId>vlxtr-openapi-generator</artifactId>
+            <version>1.0.0</version>
+          </dependency>
+        </dependencies>
         <executions>
           <execution>
             <id>generate-sources</id>
@@ -67,11 +96,11 @@
             </goals>
             <configuration>
               <inputSpec>${project.basedir}/vlxtr-allegro-api.yaml</inputSpec>
-              <generatorName>java</generatorName>
+              <generatorName>vlxtr-java</generatorName>
               <output>${project.build.directory}/generated-sources/openapi</output>
               <apiPackage>com.p4r1nc3.vlxtr.allegro.api</apiPackage>
               <modelPackage>com.p4r1nc3.vlxtr.allegro.model</modelPackage>
-              <templateDirectory>${project.basedir}/../custom-templates</templateDirectory>
+              <templateDirectory>${project.basedir}/../vlxtr-openapi-generator/src/main/resources/vlxtr-java</templateDirectory>
               <configOptions>
                 <library>okhttp-gson</library>
                 <dateLibrary>java8</dateLibrary>
@@ -79,9 +108,55 @@
                 <useOneOfDiscriminatorLookup>true</useOneOfDiscriminatorLookup>
                 <useOptional>true</useOptional>
               </configOptions>
+              <typeMappings>
+                <typeMapping>marketedBeforeGPSRObligation=MarketedBeforeGPSRObligation</typeMapping>
+              </typeMappings>
+              <!-- Skip tests generation to avoid JUnit issues -->
+              <generateApiTests>false</generateApiTests>
+              <generateModelTests>false</generateModelTests>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+
+      <!-- Add source directories to build -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.3.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-sources/openapi</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <!-- Maven Compiler Plugin -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+        <configuration>
+          <release>17</release>
+          <source>17</source>
+          <target>17</target>
+        </configuration>
+      </plugin>
+
+      <!-- Maven Surefire Plugin for running tests -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>3.2.5</version>
       </plugin>
     </plugins>
   </build>

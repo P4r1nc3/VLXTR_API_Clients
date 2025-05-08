@@ -20,9 +20,7 @@
 {{/vars}}
 })
 {{#isClassnameSanitized}}
-{{^hasDiscriminatorWithNonEmptyMapping}}
 @JsonTypeName("{{name}}")
-{{/hasDiscriminatorWithNonEmptyMapping}}
 {{/isClassnameSanitized}}
 {{/jackson}}
 {{>additionalModelTypeAnnotations}}{{>generatedAnnotation}}{{#discriminator}}{{>typeInfoAnnotation}}{{/discriminator}}{{>xmlAnnotation}}
@@ -37,7 +35,9 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{#vars}}
     {{#isEnum}}
     {{^isContainer}}
+    {{^vendorExtensions.x-enum-as-string}}
 {{>modelInnerEnum}}
+    {{/vendorExtensions.x-enum-as-string}}
     {{/isContainer}}
     {{#isContainer}}
     {{#mostInnerItems}}
@@ -56,88 +56,82 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     {{#isXmlWrapped}}
   @XmlElementWrapper(name = "{{xmlName}}{{^xmlName}}{{baseName}}{{/xmlName}}"{{#xmlNamespace}}, namespace = "{{.}}"{{/xmlNamespace}})
     {{/isXmlWrapped}}
-    {{^isXmlAttribute}}
-      {{#isDateTime}}
-  @XmlJavaTypeAdapter(OffsetDateTimeXmlAdapter.class)
-      {{/isDateTime}}
-    {{/isXmlAttribute}}
   {{/withXml}}
   {{#gson}}
+{{#vendorExtensions.x-has-multiple-parts}}
 @SerializedName(value = SERIALIZED_NAME_{{nameInSnakeCase}}, alternate = {"{{name}}"})
+{{/vendorExtensions.x-has-multiple-parts}}
+{{^vendorExtensions.x-has-multiple-parts}}
+@SerializedName(SERIALIZED_NAME_{{nameInSnakeCase}})
+{{/vendorExtensions.x-has-multiple-parts}}
   {{/gson}}
-  {{>nullable_var_annotations}}
   {{#vendorExtensions.x-field-extra-annotation}}
   {{{vendorExtensions.x-field-extra-annotation}}}
   {{/vendorExtensions.x-field-extra-annotation}}
   {{#vendorExtensions.x-is-jackson-optional-nullable}}
   {{#isContainer}}
-  {{#hasChildren}}protected{{/hasChildren}}{{^hasChildren}}private{{/hasChildren}} JsonNullable<{{{datatypeWithEnum}}}> {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>undefined();
+  {{#deprecated}}
+  @Deprecated
+  {{/deprecated}}
+  private JsonNullable<{{{datatypeWithEnum}}}> {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>undefined();
   {{/isContainer}}
   {{^isContainer}}
-  {{#hasChildren}}protected{{/hasChildren}}{{^hasChildren}}private{{/hasChildren}} JsonNullable<{{{datatypeWithEnum}}}> {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>{{#defaultValue}}of({{{.}}}){{/defaultValue}}{{^defaultValue}}undefined(){{/defaultValue}};
+  {{#deprecated}}
+  @Deprecated
+  {{/deprecated}}
+  private JsonNullable<{{{datatypeWithEnum}}}> {{name}} = JsonNullable.<{{{datatypeWithEnum}}}>{{#defaultValue}}of({{{.}}}){{/defaultValue}}{{^defaultValue}}undefined(){{/defaultValue}};
   {{/isContainer}}
   {{/vendorExtensions.x-is-jackson-optional-nullable}}
   {{^vendorExtensions.x-is-jackson-optional-nullable}}
-  {{#isContainer}}
-  {{#hasChildren}}protected{{/hasChildren}}{{^hasChildren}}private{{/hasChildren}} {{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
-  {{/isContainer}}
-  {{^isContainer}}
-  {{#hasChildren}}protected{{/hasChildren}}{{^hasChildren}}private{{/hasChildren}} {{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
-  {{/isContainer}}
+  {{#deprecated}}
+  @Deprecated
+  {{/deprecated}}
+  {{>nullable_var_annotations}}
+  private {{{datatypeWithEnum}}} {{name}}{{#defaultValue}} = {{{.}}}{{/defaultValue}};
   {{/vendorExtensions.x-is-jackson-optional-nullable}}
 
   {{/vars}}
-  public {{classname}}() {
-    {{#parent}}
-    {{#parcelableModel}}
-    super();{{/parcelableModel}}
-    {{/parent}}
-    {{#gson}}
-    {{#discriminator}}
-    {{#discriminator.isEnum}}
-    this.{{{discriminatorName}}} = this.getClass().getSimpleName();
-    {{/discriminator.isEnum}}
-    {{/discriminator}}
-    {{/gson}}
-  }
-  {{#vendorExtensions.x-has-readonly-properties}}
-  {{^withXml}}
-  /**
-   * Constructor with only readonly parameters{{#generateConstructorWithAllArgs}}{{^vendorExtensions.x-java-all-args-constructor}} and all parameters{{/vendorExtensions.x-java-all-args-constructor}}{{/generateConstructorWithAllArgs}}
-   */
-  {{#jsonb}}@JsonbCreator{{/jsonb}}{{#jackson}}@JsonCreator{{/jackson}}
+  public {{classname}}() { {{#parent}}{{#parcelableModel}}
+    super();{{/parcelableModel}}{{/parent}}{{#gson}}{{#discriminator}}
+    this.{{{discriminatorName}}} = this.getClass().getSimpleName();{{/discriminator}}{{/gson}}
+  }{{#vendorExtensions.x-has-readonly-properties}}{{^withXml}}{{#jackson}}
+
+  @JsonCreator
   public {{classname}}(
   {{#readOnlyVars}}
-    {{#jsonb}}@JsonbProperty(value = "{{baseName}}"{{^required}}, nullable = true{{/required}}){{/jsonb}}{{#jackson}}@JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}}){{/jackson}} {{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}
+    {{#jackson}}@JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}}){{/jackson}} {{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}
   {{/readOnlyVars}}
   ) {
     this();
   {{#readOnlyVars}}
     this.{{name}} = {{#vendorExtensions.x-is-jackson-optional-nullable}}{{name}} == null ? JsonNullable.<{{{datatypeWithEnum}}}>undefined() : JsonNullable.of({{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{name}}{{/vendorExtensions.x-is-jackson-optional-nullable}};
   {{/readOnlyVars}}
-  }
-  {{/withXml}}
-  {{/vendorExtensions.x-has-readonly-properties}}
-{{#vendorExtensions.x-java-all-args-constructor}}
-
-  /**
-   * Constructor with all args parameters
-   */
-  public {{classname}}({{#vendorExtensions.x-java-all-args-constructor-vars}}{{#jsonb}}@JsonbProperty(value = "{{baseName}}"{{^required}}, nullable = true{{/required}}){{/jsonb}}{{#jackson}}@JsonProperty(JSON_PROPERTY_{{nameInSnakeCase}}){{/jackson}} {{{datatypeWithEnum}}} {{name}}{{^-last}}, {{/-last}}{{/vendorExtensions.x-java-all-args-constructor-vars}}) {
-{{#parent}}
-    super({{#parentVars}}{{name}}{{^-last}}, {{/-last}}{{/parentVars}});
-{{/parent}}
+  }{{/jackson}}{{/withXml}}{{/vendorExtensions.x-has-readonly-properties}}
   {{#vars}}
-    this.{{name}} = {{#vendorExtensions.x-is-jackson-optional-nullable}}{{name}} == null ? JsonNullable.<{{{datatypeWithEnum}}}>undefined() : JsonNullable.of({{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{name}}{{/vendorExtensions.x-is-jackson-optional-nullable}};
-{{/vars}}
-  }
-{{/vendorExtensions.x-java-all-args-constructor}}
 
-{{#vars}}
   {{^isReadOnly}}
+  {{#vendorExtensions.x-enum-as-string}}
+  public static final Set<String> {{{nameInSnakeCase}}}_VALUES = new HashSet<>(Arrays.asList(
+    {{#allowableValues}}{{#enumVars}}{{{value}}}{{^-last}}, {{/-last}}{{/enumVars}}{{/allowableValues}}
+  ));
+
+  {{/vendorExtensions.x-enum-as-string}}
+  {{#deprecated}}
+  @Deprecated
+  {{/deprecated}}
   public {{classname}} {{name}}({{>nullable_var_annotations}} {{{datatypeWithEnum}}} {{name}}) {
-    {{#vendorExtensions.x-is-jackson-optional-nullable}}this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});{{/vendorExtensions.x-is-jackson-optional-nullable}}
-    {{^vendorExtensions.x-is-jackson-optional-nullable}}this.{{name}} = {{name}};{{/vendorExtensions.x-is-jackson-optional-nullable}}
+    {{#vendorExtensions.x-enum-as-string}}
+    if (!{{{nameInSnakeCase}}}_VALUES.contains({{name}})) {
+      throw new IllegalArgumentException({{name}} + " is invalid. Possible values for {{name}}: " + String.join(", ", {{{nameInSnakeCase}}}_VALUES));
+    }
+
+    {{/vendorExtensions.x-enum-as-string}}
+    {{#vendorExtensions.x-is-jackson-optional-nullable}}
+    this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});
+    {{/vendorExtensions.x-is-jackson-optional-nullable}}
+    {{^vendorExtensions.x-is-jackson-optional-nullable}}
+    this.{{name}} = {{name}};
+    {{/vendorExtensions.x-is-jackson-optional-nullable}}
     return this;
   }
   {{#isArray}}
@@ -178,11 +172,9 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     return this;
     {{/vendorExtensions.x-is-jackson-optional-nullable}}
     {{^vendorExtensions.x-is-jackson-optional-nullable}}
-    {{^required}}
     if (this.{{name}} == null) {
       this.{{name}} = {{{defaultValue}}}{{^defaultValue}}new HashMap<>(){{/defaultValue}};
     }
-    {{/required}}
     this.{{name}}.put(key, {{name}}Item);
     return this;
     {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -204,17 +196,14 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
    * maximum: {{.}}
   {{/maximum}}
    * @return {{name}}
-   {{#deprecated}}
+  {{#deprecated}}
    * @deprecated
-   {{/deprecated}}
+  {{/deprecated}}
    */
 {{#deprecated}}
   @Deprecated
 {{/deprecated}}
   {{>nullable_var_annotations}}
-{{#jsonb}}
-  @JsonbProperty("{{baseName}}")
-{{/jsonb}}
 {{#useBeanValidation}}
 {{>beanValidation}}
 {{/useBeanValidation}}
@@ -260,8 +249,17 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{/vendorExtensions.x-is-jackson-optional-nullable}}
 
   {{^isReadOnly}}
+  {{#deprecated}}
+  @Deprecated
+  {{/deprecated}}
 {{#vendorExtensions.x-setter-extra-annotation}}  {{{vendorExtensions.x-setter-extra-annotation}}}
 {{/vendorExtensions.x-setter-extra-annotation}}{{#jackson}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{> jackson_annotations}}{{/vendorExtensions.x-is-jackson-optional-nullable}}{{/jackson}}  public void {{setter}}({{>nullable_var_annotations}} {{{datatypeWithEnum}}} {{name}}) {
+    {{#vendorExtensions.x-enum-as-string}}
+    if (!{{{nameInSnakeCase}}}_VALUES.contains({{name}})) {
+      throw new IllegalArgumentException({{name}} + " is invalid. Possible values for {{name}}: " + String.join(", ", {{{nameInSnakeCase}}}_VALUES));
+    }
+
+    {{/vendorExtensions.x-enum-as-string}}
     {{#vendorExtensions.x-is-jackson-optional-nullable}}
     this.{{name}} = JsonNullable.<{{{datatypeWithEnum}}}>of({{name}});
     {{/vendorExtensions.x-is-jackson-optional-nullable}}
@@ -272,23 +270,10 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{/isReadOnly}}
 
   {{/vars}}
-  {{#parent}}
-  {{#readWriteVars}}
-  {{#isOverridden}}
-  @Override
-  public {{classname}} {{name}}({{>nullable_var_annotations}} {{{datatypeWithEnum}}} {{name}}) {
-    {{#vendorExtensions.x-is-jackson-optional-nullable}}
-    this.{{setter}}(JsonNullable.<{{{datatypeWithEnum}}}>of({{name}}));
-    {{/vendorExtensions.x-is-jackson-optional-nullable}}
-    {{^vendorExtensions.x-is-jackson-optional-nullable}}
-    this.{{setter}}({{name}});
-    {{/vendorExtensions.x-is-jackson-optional-nullable}}
-    return this;
-  }
-
-  {{/isOverridden}}
-  {{/readWriteVars}}
-  {{/parent}}
+{{>libraries/jersey2/additional_properties}}
+  /**
+   * Return true if this {{name}} object is equal to o.
+   */
   @Override
   public boolean equals(Object o) {
   {{#useReflectionEqualsHashCode}}
@@ -303,7 +288,8 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     }{{#hasVars}}
     {{classname}} {{classVarName}} = ({{classname}}) o;
     return {{#vars}}{{#vendorExtensions.x-is-jackson-optional-nullable}}equalsNullable(this.{{name}}, {{classVarName}}.{{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{#isByteArray}}Arrays{{/isByteArray}}{{^isByteArray}}Objects{{/isByteArray}}.equals(this.{{name}}, {{classVarName}}.{{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^-last}} &&
-        {{/-last}}{{/vars}}{{#parent}} &&
+        {{/-last}}{{/vars}}{{#additionalPropertiesType}}&&
+        Objects.equals(this.additionalProperties, {{classVarName}}.additionalProperties){{/additionalPropertiesType}}{{#parent}} &&
         super.equals(o){{/parent}};{{/hasVars}}{{^hasVars}}
     return {{#parent}}super.equals(o){{/parent}}{{^parent}}true{{/parent}};{{/hasVars}}
   {{/useReflectionEqualsHashCode}}
@@ -319,7 +305,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     return HashCodeBuilder.reflectionHashCode(this);
   {{/useReflectionEqualsHashCode}}
   {{^useReflectionEqualsHashCode}}
-    return Objects.hash({{#vars}}{{#vendorExtensions.x-is-jackson-optional-nullable}}hashCodeNullable({{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{^isByteArray}}{{name}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{/vendorExtensions.x-is-jackson-optional-nullable}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}});
+    return Objects.hash({{#vars}}{{#vendorExtensions.x-is-jackson-optional-nullable}}hashCodeNullable({{name}}){{/vendorExtensions.x-is-jackson-optional-nullable}}{{^vendorExtensions.x-is-jackson-optional-nullable}}{{^isByteArray}}{{name}}{{/isByteArray}}{{#isByteArray}}Arrays.hashCode({{name}}){{/isByteArray}}{{/vendorExtensions.x-is-jackson-optional-nullable}}{{^-last}}, {{/-last}}{{/vars}}{{#parent}}{{#hasVars}}, {{/hasVars}}super.hashCode(){{/parent}}{{#additionalPropertiesType}}{{#hasVars}}, {{/hasVars}}{{^hasVars}}{{#parent}}, {{/parent}}{{/hasVars}}additionalProperties{{/additionalPropertiesType}});
   {{/useReflectionEqualsHashCode}}
   }{{#vendorExtensions.x-jackson-optional-nullable-helpers}}
 
@@ -340,6 +326,9 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     {{#vars}}
     sb.append("    {{name}}: ").append({{#isPassword}}"*"{{/isPassword}}{{^isPassword}}toIndentedString({{name}}){{/isPassword}}).append("\n");
     {{/vars}}
+    {{#additionalPropertiesType}}
+    sb.append("    additionalProperties: ").append(toIndentedString(additionalProperties)).append("\n");
+    {{/additionalPropertiesType}}
     sb.append("}");
     return sb.toString();
   }
@@ -348,206 +337,13 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
    * Convert the given object to string with each line indented by 4 spaces
    * (except the first line).
    */
-  private{{#jsonb}} static{{/jsonb}} String toIndentedString(Object o) {
+  private String toIndentedString(Object o) {
     if (o == null) {
       return "null";
     }
     return o.toString().replace("\n", "\n    ");
   }
-{{#supportUrlQuery}}
 
-  /**
-   * Convert the instance into URL query string.
-   *
-   * @return URL query string
-   */
-  public String toUrlQueryString() {
-    return toUrlQueryString(null);
-  }
-
-  /**
-   * Convert the instance into URL query string.
-   *
-   * @param prefix prefix of the query string
-   * @return URL query string
-   */
-  public String toUrlQueryString(String prefix) {
-    String suffix = "";
-    String containerSuffix = "";
-    String containerPrefix = "";
-    if (prefix == null) {
-      // style=form, explode=true, e.g. /pet?name=cat&type=manx
-      prefix = "";
-    } else {
-      // deepObject style e.g. /pet?id[name]=cat&id[type]=manx
-      prefix = prefix + "[";
-      suffix = "]";
-      containerSuffix = "]";
-      containerPrefix = "[";
-    }
-
-    StringJoiner joiner = new StringJoiner("&");
-
-    {{#allVars}}
-    // add `{{baseName}}` to the URL query string
-    {{#isArray}}
-    {{#items.isPrimitiveType}}
-    {{#uniqueItems}}
-    if ({{getter}}() != null) {
-      int i = 0;
-      for ({{{items.datatypeWithEnum}}} _item : {{getter}}()) {
-        try {
-          joiner.add(String.format("%s{{baseName}}%s%s=%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix),
-              URLEncoder.encode(String.valueOf(_item), "UTF-8").replaceAll("\\+", "%20")));
-        } catch (UnsupportedEncodingException e) {
-          // Should never happen, UTF-8 is always supported
-          throw new RuntimeException(e);
-        }
-      }
-      i++;
-    }
-    {{/uniqueItems}}
-    {{^uniqueItems}}
-    if ({{getter}}() != null) {
-      for (int i = 0; i < {{getter}}().size(); i++) {
-        try {
-          joiner.add(String.format("%s{{baseName}}%s%s=%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix),
-              URLEncoder.encode(String.valueOf({{getter}}().get(i)), "UTF-8").replaceAll("\\+", "%20")));
-        } catch (UnsupportedEncodingException e) {
-          // Should never happen, UTF-8 is always supported
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    {{/uniqueItems}}
-    {{/items.isPrimitiveType}}
-    {{^items.isPrimitiveType}}
-    {{#items.isModel}}
-    {{#uniqueItems}}
-    if ({{getter}}() != null) {
-      int i = 0;
-      for ({{{items.dataType}}} _item : {{getter}}()) {
-        if (_item != null) {
-          joiner.add(_item.toUrlQueryString(String.format("%s{{baseName}}%s%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix))));
-        }
-      }
-      i++;
-    }
-    {{/uniqueItems}}
-    {{^uniqueItems}}
-    if ({{getter}}() != null) {
-      for (int i = 0; i < {{getter}}().size(); i++) {
-        if ({{getter}}().get(i) != null) {
-          joiner.add({{getter}}().get(i).toUrlQueryString(String.format("%s{{baseName}}%s%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix))));
-        }
-      }
-    }
-    {{/uniqueItems}}
-    {{/items.isModel}}
-    {{^items.isModel}}
-    {{#uniqueItems}}
-    if ({{getter}}() != null) {
-      int i = 0;
-      for ({{{items.dataType}}} _item : {{getter}}()) {
-        if (_item != null) {
-          try {
-            joiner.add(String.format("%s{{baseName}}%s%s=%s", prefix, suffix,
-                "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix),
-                URLEncoder.encode(String.valueOf(_item), "UTF-8").replaceAll("\\+", "%20")));
-          } catch (UnsupportedEncodingException e) {
-            // Should never happen, UTF-8 is always supported
-            throw new RuntimeException(e);
-          }
-        }
-        i++;
-      }
-    }
-    {{/uniqueItems}}
-    {{^uniqueItems}}
-    if ({{getter}}() != null) {
-      for (int i = 0; i < {{getter}}().size(); i++) {
-        if ({{getter}}().get(i) != null) {
-          try {
-            joiner.add(String.format("%s{{baseName}}%s%s=%s", prefix, suffix,
-                "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, i, containerSuffix),
-                URLEncoder.encode(String.valueOf({{getter}}().get(i)), "UTF-8").replaceAll("\\+", "%20")));
-          } catch (UnsupportedEncodingException e) {
-            // Should never happen, UTF-8 is always supported
-            throw new RuntimeException(e);
-          }
-        }
-      }
-    }
-    {{/uniqueItems}}
-    {{/items.isModel}}
-    {{/items.isPrimitiveType}}
-    {{/isArray}}
-    {{^isArray}}
-    {{#isMap}}
-    {{^items.isModel}}
-    if ({{getter}}() != null) {
-      for (String _key : {{getter}}().keySet()) {
-        try {
-          joiner.add(String.format("%s{{baseName}}%s%s=%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, _key, containerSuffix),
-              {{getter}}().get(_key), URLEncoder.encode(String.valueOf({{getter}}().get(_key)), "UTF-8").replaceAll("\\+", "%20")));
-        } catch (UnsupportedEncodingException e) {
-          // Should never happen, UTF-8 is always supported
-          throw new RuntimeException(e);
-        }
-      }
-    }
-    {{/items.isModel}}
-    {{#items.isModel}}
-    if ({{getter}}() != null) {
-      for (String _key : {{getter}}().keySet()) {
-        if ({{getter}}().get(_key) != null) {
-          joiner.add({{getter}}().get(_key).toUrlQueryString(String.format("%s{{baseName}}%s%s", prefix, suffix,
-              "".equals(suffix) ? "" : String.format("%s%d%s", containerPrefix, _key, containerSuffix))));
-        }
-      }
-    }
-    {{/items.isModel}}
-    {{/isMap}}
-    {{^isMap}}
-    {{#isPrimitiveType}}
-    if ({{getter}}() != null) {
-      try {
-        joiner.add(String.format("%s{{{baseName}}}%s=%s", prefix, suffix, URLEncoder.encode(String.valueOf({{{getter}}}()), "UTF-8").replaceAll("\\+", "%20")));
-      } catch (UnsupportedEncodingException e) {
-        // Should never happen, UTF-8 is always supported
-        throw new RuntimeException(e);
-      }
-    }
-    {{/isPrimitiveType}}
-    {{^isPrimitiveType}}
-    {{#isModel}}
-    if ({{getter}}() != null) {
-      joiner.add({{getter}}().toUrlQueryString(prefix + "{{{baseName}}}" + suffix));
-    }
-    {{/isModel}}
-    {{^isModel}}
-    if ({{getter}}() != null) {
-      try {
-        joiner.add(String.format("%s{{{baseName}}}%s=%s", prefix, suffix, URLEncoder.encode(String.valueOf({{{getter}}}()), "UTF-8").replaceAll("\\+", "%20")));
-      } catch (UnsupportedEncodingException e) {
-        // Should never happen, UTF-8 is always supported
-        throw new RuntimeException(e);
-      }
-    }
-    {{/isModel}}
-    {{/isPrimitiveType}}
-    {{/isMap}}
-    {{/isArray}}
-
-    {{/allVars}}
-    return joiner.toString();
-  }
-{{/supportUrlQuery}}
 {{#parcelableModel}}
 
   public void writeToParcel(Parcel out, int flags) {
@@ -589,7 +385,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     return 0;
   }
 
-  public static final Parcelable.Creator<{{classname}}> CREATOR = new Parcelable.Creator<{{classname}}>() {
+  public static final Parcelable.Creator<{{classname}}> CREATOR = new Parcelable.Creator<>() {
     public {{classname}} createFromParcel(Parcel in) {
 {{#model}}
 {{#isArray}}
@@ -607,9 +403,15 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     }
   };
 {{/parcelableModel}}
-{{#generateBuilders}}
-
-  {{>javaBuilder}}
-{{/generateBuilders}}
-
+{{#discriminator}}
+  static {
+    // Initialize and register the discriminator mappings.
+    Map<String, Class<?>> mappings = new HashMap<>();
+    {{#mappedModels}}
+    mappings.put("{{mappingName}}", {{modelName}}.class);
+    {{/mappedModels}}
+    mappings.put("{{name}}", {{classname}}.class);
+    JSON.registerDiscriminator({{classname}}.class, "{{propertyBaseName}}", mappings);
+  }
+{{/discriminator}}
 }
