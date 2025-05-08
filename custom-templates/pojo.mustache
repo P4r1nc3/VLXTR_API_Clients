@@ -63,7 +63,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     {{/isXmlAttribute}}
   {{/withXml}}
   {{#gson}}
-  @SerializedName(SERIALIZED_NAME_{{nameInSnakeCase}})
+@SerializedName(value = SERIALIZED_NAME_{{nameInSnakeCase}}, alternate = {"{{name}}"})
   {{/gson}}
   {{>nullable_var_annotations}}
   {{#vendorExtensions.x-field-extra-annotation}}

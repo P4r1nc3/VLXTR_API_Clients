@@ -66,7 +66,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
   {{#deprecated}}
   @Deprecated
   {{/deprecated}}
-  @SerializedName(SERIALIZED_NAME_{{nameInSnakeCase}})
+@SerializedName(value = SERIALIZED_NAME_{{nameInSnakeCase}}, alternate = {"{{name}}"})
   {{#vendorExtensions.x-field-extra-annotation}}
   {{{vendorExtensions.x-field-extra-annotation}}}
   {{/vendorExtensions.x-field-extra-annotation}}
