@@ -13,13 +13,13 @@ public class VlxtrJavaClientCodegen extends JavaClientCodegen {
         this.outputFolder = "generated-code/vlxtr-java";
         this.apiPackage = "com.p4r1nc3.vlxtr.api";
         this.modelPackage = "com.p4r1nc3.vlxtr.model";
-        this.templateDir = "vlxtr-java"; // katalog z twoimi mustache'ami
-        this.setLibrary("okhttp-gson"); // zakładamy, że używasz Gson
+        this.templateDir = "vlxtr-java";
+        this.setLibrary("okhttp-gson");
     }
 
     @Override
     public String getName() {
-        return "vlxtr-java"; // używane w generatorName
+        return "vlxtr-java";
     }
 
     @Override
@@ -29,11 +29,8 @@ public class VlxtrJavaClientCodegen extends JavaClientCodegen {
         for (ModelMap mo : result.getModels()) {
             CodegenModel cm = mo.getModel();
             for (CodegenProperty prop : cm.getVars()) {
-                // Sprawdź, czy nazwa w formacie snake_case zawiera podkreślnik
                 String snakeCase = prop.getNameInSnakeCase();
                 boolean hasMultipleParts = snakeCase.contains("_");
-
-                // Dodaj flagę do vendorExtensions, aby użyć jej w szablonie Mustache
                 prop.vendorExtensions.put("x-has-multiple-parts", hasMultipleParts);
             }
         }

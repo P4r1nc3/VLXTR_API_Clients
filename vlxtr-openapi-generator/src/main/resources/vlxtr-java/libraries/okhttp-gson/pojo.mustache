@@ -325,6 +325,7 @@ public class {{classname}} {{#parent}}extends {{{.}}} {{/parent}}{{#vendorExtens
     openapiFields = new HashSet<String>();
     {{#allVars}}
     openapiFields.add("{{baseName}}");
+    openapiFields.add("{{name}}");
     {{/allVars}}
 
     // a set of required properties/fields (JSON key names)

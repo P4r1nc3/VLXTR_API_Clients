@@ -14,7 +14,7 @@
   <groupId>com.p4r1nc3.vlxtr</groupId>
   <artifactId>vlxtr-allegro-api</artifactId>
   <packaging>jar</packaging>
-  <version>1.3.5</version>
+  <version>1.3.6</version>
 
   <properties>
     <openapi.generator.version>7.11.0</openapi.generator.version>
@@ -55,7 +55,7 @@
     <dependency>
       <groupId>com.p4r1nc3.vlxtr</groupId>
       <artifactId>vlxtr-openapi-generator</artifactId>
-      <version>1.0.0</version>
+      <version>1.0.1</version>
     </dependency>
 
     <!-- JUnit dependencies for tests -->
@@ -80,12 +80,11 @@
         <groupId>org.openapitools</groupId>
         <artifactId>openapi-generator-maven-plugin</artifactId>
         <version>${openapi.generator.version}</version>
-        <!-- Add the dependencies to include your custom generator -->
         <dependencies>
           <dependency>
             <groupId>com.p4r1nc3.vlxtr</groupId>
             <artifactId>vlxtr-openapi-generator</artifactId>
-            <version>1.0.0</version>
+            <version>1.0.1</version>
           </dependency>
         </dependencies>
         <executions>
