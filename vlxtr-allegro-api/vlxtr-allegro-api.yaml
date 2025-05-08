@@ -106,7 +106,7 @@ paths:
                 notFoundExample:
                   $ref: "#/components/examples/NotFoundErrorResponse"
 
-  /tokens/register:
+  /tokens:
     post:
       tags:
         - Tokens
@@ -122,7 +122,6 @@ paths:
               schema:
                 $ref: "#/components/schemas/TokenRegister"
 
-  /tokens:
     get:
       tags:
         - Tokens
