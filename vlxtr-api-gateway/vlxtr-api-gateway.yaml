@@ -96,6 +96,42 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
+  /auth/verify:
+    put:
+      tags:
+        - Authentication
+      summary: Verify user email
+      description: Marks a user's email as verified based on the device code from Allegro authentication
+      operationId: verifyUserEmail
+      parameters:
+        - name: deviceCode
+          in: query
+          description: The device code used during Allegro authentication
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: User email successfully verified
+        "400":
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
   /test:
     get:
       tags:
