@@ -17,8 +17,35 @@ security:
 tags:
   - name: Printers
     description: Endpoints related to managing and retrieving Bambu Lab printers.
+  - name: Printer Operations
+    description: Endpoints related to printer operations like calibration, temperature control, etc.
+  - name: Print Jobs
+    description: Endpoints related to managing print jobs.
+  - name: Filaments
+    description: Endpoints related to managing filaments.
+  - name: System
+    description: System-related endpoints.
 
 paths:
+  /test:
+    get:
+      tags:
+        - System
+      summary: Test Endpoint
+      description: Simple test endpoint to verify the API is working.
+      operationId: testEndpoint
+      responses:
+        "200":
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Test endpoint"
+
   /printers:
     post:
       tags:
@@ -131,7 +158,7 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
         "404":
-          description: Offer not found
+          description: Printer not found
           content:
             application/json:
               schema:
@@ -184,7 +211,7 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
         "404":
-          description: Offer not found
+          description: Printer not found
           content:
             application/json:
               schema:
@@ -227,7 +254,7 @@ paths:
                 unauthorizedExample:
                   $ref: "#/components/examples/UnauthorizedErrorResponse"
         "404":
-          description: Offer not found
+          description: Printer not found
           content:
             application/json:
               schema:
@@ -235,6 +262,920 @@ paths:
               examples:
                 notFoundExample:
                   $ref: "#/components/examples/NotFoundErrorResponse"
+
+  /printers/{serial}/turnLightOn:
+    post:
+      tags:
+        - Printer Operations
+      summary: Turn Light On
+      description: Turn on the printer's chamber light.
+      operationId: turnLightOn
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Light successfully turned on.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/turnLightOff:
+    post:
+      tags:
+        - Printer Operations
+      summary: Turn Light Off
+      description: Turn off the printer's chamber light.
+      operationId: turnLightOff
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Light successfully turned off.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/status:
+    get:
+      tags:
+        - Printer Operations
+      summary: Get Printer Status
+      description: Get comprehensive status information about the printer.
+      operationId: getPrinterStatus
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved printer status.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrinterStatusResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/job:
+    get:
+      tags:
+        - Print Jobs
+      summary: Get Print Job
+      description: Get detailed information about the current print job.
+      operationId: getPrintJob
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved print job information.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PrintJobResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/temperature/bed:
+    post:
+      tags:
+        - Printer Operations
+      summary: Set Bed Temperature
+      description: Set the bed temperature of the printer.
+      operationId: setBedTemperature
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temperature:
+                  type: integer
+                  description: Target bed temperature in Celsius.
+                  example: 60
+              required:
+                - temperature
+      responses:
+        "204":
+          description: Bed temperature set successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/temperature/nozzle:
+    post:
+      tags:
+        - Printer Operations
+      summary: Set Nozzle Temperature
+      description: Set the nozzle temperature of the printer.
+      operationId: setNozzleTemperature
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                temperature:
+                  type: integer
+                  description: Target nozzle temperature in Celsius.
+                  example: 210
+              required:
+                - temperature
+      responses:
+        "204":
+          description: Nozzle temperature set successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/files:
+    post:
+      tags:
+        - Printer Operations
+      summary: Upload File
+      description: Upload a file to the printer without starting a print.
+      operationId: uploadFile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The file to upload (3MF, STL, etc.)
+      responses:
+        "201":
+          description: File uploaded successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  filename:
+                    type: string
+                    description: The filename as stored on the printer.
+                  size:
+                    type: integer
+                    description: The size of the uploaded file in bytes.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/files/{filename}:
+    delete:
+      tags:
+        - Printer Operations
+      summary: Delete File
+      description: Delete a file from the printer's storage.
+      operationId: deleteFile
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: filename
+          in: path
+          required: true
+          description: Name of the file to delete.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: File deleted successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer or file not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/home:
+    post:
+      tags:
+        - Printer Operations
+      summary: Home Printer
+      description: Home the printer axes.
+      operationId: homePrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Printer homing initiated successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/calibrate:
+    post:
+      tags:
+        - Printer Operations
+      summary: Calibrate Printer
+      description: Start a printer calibration routine.
+      operationId: calibratePrinter
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                calibration_type:
+                  $ref: "#/components/schemas/CalibrationType"
+              required:
+                - calibration_type
+      responses:
+        "202":
+          description: Calibration initiated successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/filament/load:
+    post:
+      tags:
+        - Printer Operations
+      summary: Load Filament
+      description: Load filament into the printer extruder.
+      operationId: loadFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Filament loading initiated successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/filament/unload:
+    post:
+      tags:
+        - Printer Operations
+      summary: Unload Filament
+      description: Unload filament from the printer extruder.
+      operationId: unloadFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "202":
+          description: Filament unloading initiated successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/print:
+    post:
+      tags:
+        - Print Jobs
+      summary: Start Print
+      description: Upload and start printing a 3MF file on the specified printer.
+      operationId: startPrint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: The 3MF file to print
+      responses:
+        "201":
+          description: Print job started successfully.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  job_id:
+                    type: string
+                    description: Unique identifier for the print job.
+                  filename:
+                    type: string
+                    description: The name of the file being printed.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/pause:
+    post:
+      tags:
+        - Print Jobs
+      summary: Pause Print
+      description: Pause the current print job on the specified printer.
+      operationId: pausePrint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Print job paused successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict - No active print job to pause
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/resume:
+    post:
+      tags:
+        - Print Jobs
+      summary: Resume Print
+      description: Resume a paused print job on the specified printer.
+      operationId: resumePrint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Print job resumed successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict - No paused print job to resume
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /printers/{serial}/stop:
+    post:
+      tags:
+        - Print Jobs
+      summary: Stop Print
+      description: Stop (cancel) the current print job on the specified printer.
+      operationId: stopPrint
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: serial
+          in: path
+          required: true
+          description: Unique serial number of the printer.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Print job stopped successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Printer not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "409":
+          description: Conflict - No active print job to stop
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /filaments:
+    get:
+      tags:
+        - Filaments
+      summary: Get All Filaments
+      description: Get a list of all filaments in the system.
+      operationId: getAllFilaments
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved all filaments.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Filament"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    post:
+      tags:
+        - Filaments
+      summary: Add Filament
+      description: Create a new filament record.
+      operationId: addFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FilamentCreate"
+      responses:
+        "201":
+          description: Filament created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Filament"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /filaments/{filament_id}:
+    get:
+      tags:
+        - Filaments
+      summary: Get Filament
+      description: Get detailed information about a specific filament.
+      operationId: getFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filament_id
+          in: path
+          required: true
+          description: ID of the filament.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Successfully retrieved filament details.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Filament"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Filament not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    patch:
+      tags:
+        - Filaments
+      summary: Update Filament
+      description: Update a specific filament's details.
+      operationId: updateFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filament_id
+          in: path
+          required: true
+          description: ID of the filament to update.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/FilamentUpdate"
+      responses:
+        "200":
+          description: Filament updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Filament"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Filament not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+    delete:
+      tags:
+        - Filaments
+      summary: Delete Filament
+      description: Delete a filament from the system.
+      operationId: deleteFilament
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: filament_id
+          in: path
+          required: true
+          description: ID of the filament to delete.
+          schema:
+            type: string
+        - name: Authorization
+          in: header
+          required: true
+          description: Bearer token.
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Filament deleted successfully.
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+        "404":
+          description: Filament not found
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
 
 components:
   securitySchemes:
@@ -318,6 +1259,364 @@ components:
           description: Updated security access code of the printer (optional).
           example: "87654321"
 
+    PrinterStatusResponse:
+      type: object
+      description: Comprehensive status information about a printer.
+      properties:
+        online:
+          type: boolean
+          description: Whether the printer is currently online and connected.
+          example: true
+        state:
+          type: string
+          description: Current operational state of the printer.
+          example: "printing"
+          enum: ["idle", "printing", "paused", "complete", "error", "offline"]
+        bed_temperature:
+          type: object
+          properties:
+            current:
+              type: number
+              format: float
+              description: Current bed temperature in Celsius.
+              example: 58.5
+            target:
+              type: number
+              format: float
+              description: Target bed temperature in Celsius.
+              example: 60.0
+        nozzle_temperature:
+          type: object
+          properties:
+            current:
+              type: number
+              format: float
+              description: Current nozzle temperature in Celsius.
+              example: 209.3
+            target:
+              type: number
+              format: float
+              description: Target nozzle temperature in Celsius.
+              example: 210.0
+        chamber_temperature:
+          type: number
+          format: float
+          description: Current chamber temperature in Celsius.
+          example: 32.1
+        error_code:
+          type: string
+          description: Error code if the printer is in an error state.
+          example: "E1001"
+        error_message:
+          type: string
+          description: Human-readable error message if the printer is in an error state.
+          example: "Filament runout detected"
+        light_status:
+          type: boolean
+          description: Whether the printer light is currently on.
+          example: true
+        fan_speed:
+          type: object
+          properties:
+            part_cooling:
+              type: integer
+              description: Part cooling fan speed as percentage.
+              example: 100
+            aux_fan:
+              type: integer
+              description: Auxiliary fan speed as percentage.
+              example: 50
+            chamber_fan:
+              type: integer
+              description: Chamber fan speed as percentage.
+              example: 25
+        filament_sensors:
+          type: object
+          properties:
+            has_filament:
+              type: boolean
+              description: Whether filament is detected in the sensor.
+              example: true
+            type:
+              type: string
+              description: Type of filament currently loaded (if detected).
+              example: "PLA"
+            color:
+              type: string
+              description: Color of filament currently loaded (if detected).
+              example: "Red"
+        has_active_job:
+          type: boolean
+          description: Whether the printer has an active print job.
+          example: true
+
+    PrintJobResponse:
+      type: object
+      description: Detailed information about a print job.
+      properties:
+        filename:
+          type: string
+          description: Name of the file being printed.
+          example: "benchy.3mf"
+        progress:
+          type: number
+          format: float
+          description: Print progress as percentage.
+          example: 34.5
+        time_elapsed:
+          type: integer
+          description: Time elapsed since print started (seconds).
+          example: 1850
+        time_remaining:
+          type: integer
+          description: Estimated time remaining (seconds).
+          example: 3600
+        layer_current:
+          type: integer
+          description: Current layer being printed.
+          example: 45
+        layer_total:
+          type: integer
+          description: Total number of layers in the print.
+          example: 132
+        started_at:
+          type: string
+          format: date-time
+          description: Timestamp when the print was started.
+          example: "2025-05-20T14:30:00Z"
+        estimated_completion:
+          type: string
+          format: date-time
+          description: Estimated timestamp of print completion.
+          example: "2025-05-20T16:30:00Z"
+        status:
+          type: string
+          description: Current status of the print job.
+          example: "printing"
+          enum: ["printing", "paused", "complete", "cancelled", "failed"]
+        error:
+          type: string
+          description: Error message if the print job failed.
+          example: "Filament runout detected"
+
+    CalibrationType:
+      type: string
+      description: Type of calibration to perform on the printer.
+      enum:
+        - "bed_leveling"
+        - "first_layer"
+        - "flow_calibration"
+        - "vibration_compensation"
+        - "acceleration_calibration"
+        - "extruder_calibration"
+        - "linear_advance"
+        - "pid_tune_bed"
+        - "pid_tune_hotend"
+      example: "bed_leveling"
+
+    Filament:
+      type: object
+      description: Represents a filament entry in the system.
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the filament.
+          example: "fil_12345"
+        name:
+          type: string
+          description: Name of the filament.
+          example: "PrusamentPLA"
+        material:
+          type: string
+          description: Material type of the filament.
+          example: "PLA"
+        color:
+          type: string
+          description: Color of the filament.
+          example: "Galaxy Black"
+        manufacturer:
+          type: string
+          description: Manufacturer of the filament.
+          example: "Prusa Research"
+        diameter:
+          type: number
+          format: float
+          description: Diameter of the filament in mm.
+          example: 1.75
+        density:
+          type: number
+          format: float
+          description: Density of the filament in g/cm³.
+          example: 1.24
+        temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Minimum recommended printing temperature in Celsius.
+              example: 190
+            max:
+              type: integer
+              description: Maximum recommended printing temperature in Celsius.
+              example: 230
+        bed_temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Minimum recommended bed temperature in Celsius.
+              example: 50
+            max:
+              type: integer
+              description: Maximum recommended bed temperature in Celsius.
+              example: 70
+        spool_weight:
+          type: number
+          format: float
+          description: Total weight of the filament spool in grams.
+          example: 1000
+        remaining_weight:
+          type: number
+          format: float
+          description: Estimated remaining filament weight in grams.
+          example: 750
+      required:
+        - name
+        - material
+        - color
+        - diameter
+
+    FilamentCreate:
+      type: object
+      description: Schema for creating a new filament entry.
+      properties:
+        name:
+          type: string
+          description: Name of the filament.
+          example: "PrusamentPLA"
+        material:
+          type: string
+          description: Material type of the filament.
+          example: "PLA"
+        color:
+          type: string
+          description: Color of the filament.
+          example: "Galaxy Black"
+        manufacturer:
+          type: string
+          description: Manufacturer of the filament.
+          example: "Prusa Research"
+        diameter:
+          type: number
+          format: float
+          description: Diameter of the filament in mm.
+          example: 1.75
+        density:
+          type: number
+          format: float
+          description: Density of the filament in g/cm³.
+          example: 1.24
+        temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Minimum recommended printing temperature in Celsius.
+              example: 190
+            max:
+              type: integer
+              description: Maximum recommended printing temperature in Celsius.
+              example: 230
+        bed_temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Minimum recommended bed temperature in Celsius.
+              example: 50
+            max:
+              type: integer
+              description: Maximum recommended bed temperature in Celsius.
+              example: 70
+        spool_weight:
+          type: number
+          format: float
+          description: Total weight of the filament spool in grams.
+          example: 1000
+        remaining_weight:
+          type: number
+          format: float
+          description: Estimated remaining filament weight in grams.
+          example: 1000
+      required:
+        - name
+        - material
+        - color
+        - diameter
+
+    FilamentUpdate:
+      type: object
+      description: Schema for updating a filament entry.
+      properties:
+        name:
+          type: string
+          description: Updated name of the filament.
+          example: "PrusamentPLA+"
+        material:
+          type: string
+          description: Updated material type of the filament.
+          example: "PLA+"
+        color:
+          type: string
+          description: Updated color of the filament.
+          example: "Galaxy Silver"
+        manufacturer:
+          type: string
+          description: Updated manufacturer of the filament.
+          example: "Prusa Research"
+        diameter:
+          type: number
+          format: float
+          description: Updated diameter of the filament in mm.
+          example: 1.75
+        density:
+          type: number
+          format: float
+          description: Updated density of the filament in g/cm³.
+          example: 1.25
+        temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Updated minimum recommended printing temperature in Celsius.
+              example: 195
+            max:
+              type: integer
+              description: Updated maximum recommended printing temperature in Celsius.
+              example: 235
+        bed_temperature_range:
+          type: object
+          properties:
+            min:
+              type: integer
+              description: Updated minimum recommended bed temperature in Celsius.
+              example: 55
+            max:
+              type: integer
+              description: Updated maximum recommended bed temperature in Celsius.
+              example: 75
+        spool_weight:
+          type: number
+          format: float
+          description: Updated total weight of the filament spool in grams.
+          example: 1000
+        remaining_weight:
+          type: number
+          format: float
+          description: Updated estimated remaining filament weight in grams.
+          example: 600
+
   examples:
     UnauthorizedErrorResponse:
       summary: An example of a 401 Unauthorized error
@@ -333,6 +1632,6 @@ components:
       value:
         status: 404
         error: "Not Found"
-        cause: "The requested printer does not exist."
-        action: "Verify printer serial number and try again."
+        cause: "The requested resource does not exist."
+        action: "Verify the ID and try again."
         correlationId: "d1608b4c-3baf-4be6-a637-76c833582575"
