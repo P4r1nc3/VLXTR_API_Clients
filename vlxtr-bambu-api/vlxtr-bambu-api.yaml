@@ -263,7 +263,7 @@ paths:
                 notFoundExample:
                   $ref: "#/components/examples/NotFoundErrorResponse"
 
-  /printers/{serial}/turnLightOn:
+  /printers/{serial}/light/on:
     post:
       tags:
         - Printer Operations
@@ -301,7 +301,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /printers/{serial}/turnLightOff:
+  /printers/{serial}/light/off:
     post:
       tags:
         - Printer Operations
@@ -792,7 +792,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /printers/{serial}/print:
+  /printers/{serial}/print/start:
     post:
       tags:
         - Print Jobs
@@ -852,7 +852,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /printers/{serial}/pause:
+  /printers/{serial}/print/pause:
     post:
       tags:
         - Print Jobs
@@ -896,7 +896,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /printers/{serial}/resume:
+  /printers/{serial}/print/resume:
     post:
       tags:
         - Print Jobs
@@ -940,7 +940,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /printers/{serial}/stop:
+  /printers/{serial}/print/stop:
     post:
       tags:
         - Print Jobs
@@ -1051,7 +1051,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ErrorResponse"
 
-  /filaments/{filament_id}:
+  /filaments/{filamentId}:
     get:
       tags:
         - Filaments
